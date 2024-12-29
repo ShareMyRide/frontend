@@ -5,12 +5,14 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link,router } from "expo-router";
 
+
 const register = () => {
   const onFormSubmit = (values) => {
     console.log(values);
     router.replace("/dashboard")
   };
   return (
+
     <SafeAreaProvider>
       <SafeAreaView>
         <View className="m-4 h-screen flex items-center justify-center">
@@ -27,7 +29,11 @@ const register = () => {
             onSubmit={onFormSubmit}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
+
+
               <View className="mt-4 w-full border p-4 flex gap-4">
+
+
                 <View>
                   <Text className="mb-2">First Name: </Text>
                   <TextInput
@@ -83,12 +89,13 @@ const register = () => {
                   />
                 </View>
                 <Button onPress={handleSubmit} title="Submit" />
-              
+
                 <Link href="/login" asChild>
                   <Pressable>
                     <Text>Already have an account ?</Text>
                   </Pressable>
                 </Link>
+
               </View>
             )}
           </Formik>

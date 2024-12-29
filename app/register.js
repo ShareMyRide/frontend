@@ -1,9 +1,11 @@
 import React from "react";
-import { Button, Text, View } from "react-native";
+import { Pressable, Button, Text, View } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { router } from "expo-router";
+import { Link,router } from "expo-router";
+
+
 const register = () => {
   const onFormSubmit = (values) => {
     console.log(values);
@@ -28,9 +30,9 @@ const register = () => {
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
 
+
               <View className="mt-4 w-full border p-4 flex gap-4">
 
-              <View className="mt-4 border p-4 flex gap-4">
 
                 <View>
                   <Text className="mb-2">First Name: </Text>
@@ -87,6 +89,13 @@ const register = () => {
                   />
                 </View>
                 <Button onPress={handleSubmit} title="Submit" />
+
+                <Link href="/login" asChild>
+                  <Pressable>
+                    <Text>Already have an account ?</Text>
+                  </Pressable>
+                </Link>
+
               </View>
             )}
           </Formik>

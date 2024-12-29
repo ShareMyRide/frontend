@@ -1,16 +1,3 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import { Text, View } from 'react-native';
-
-const register = () => {
-  return (
-    <View>
-        <Text>Register</Text>
-    </View>
-  )
-}
-export default register;
-=======
 import React from "react";
 import { Button, Text, View } from "react-native";
 import { TextInput } from "react-native";
@@ -23,6 +10,7 @@ const register = () => {
     router.replace("/dashboard")
   };
   return (
+
     <SafeAreaProvider>
       <SafeAreaView>
         <View className="m-4 h-screen flex items-center justify-center">
@@ -39,7 +27,11 @@ const register = () => {
             onSubmit={onFormSubmit}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
+
               <View className="mt-4 w-full border p-4 flex gap-4">
+
+              <View className="mt-4 border p-4 flex gap-4">
+
                 <View>
                   <Text className="mb-2">First Name: </Text>
                   <TextInput
@@ -104,4 +96,4 @@ const register = () => {
   );
 };
 export default register;
->>>>>>> Stashed changes
+

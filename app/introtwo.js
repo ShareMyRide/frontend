@@ -19,7 +19,7 @@ const introtwo = () => {
             <Text className="text-black">Skip</Text>
         </Pressable>
 
-        <Pressable  onPress={()=>{router.push("/")}} 
+        <Pressable  onPress={()=>{router.push("/introthird")}} 
          className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             <Text className="text-white" >Next</Text>
           </Pressable>

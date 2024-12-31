@@ -16,7 +16,8 @@ const dashboard = () => {
         className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           <Text className="text-white">Add Ride</Text>
         </Pressable>
-        <Pressable className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <Pressable onPress={()=>{router.push("/find-ride")}} 
+        className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           <Text className="text-white">Find Ride</Text>
         </Pressable>
       </View>

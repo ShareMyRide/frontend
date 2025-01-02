@@ -69,7 +69,7 @@ const dashboard = () => {
             </Pressable>
             <Pressable
               onPress={() => {
-                router.push("/edit-profile");
+                router.push("/profile");
                 toggleMenu();
               }}
             >

@@ -9,7 +9,7 @@ import { Link, router } from "expo-router";
 const AddRide = () => {
   const onFormSubmit = (values) => {
     console.log(values);
-    router.replace("/")
+    router.replace("/add-ride-preview")
   };
 
   return (

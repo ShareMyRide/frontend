@@ -1,7 +1,17 @@
 import React from 'react'
 //import MapView from 'react-native-maps';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable,Button, Text, View } from 'react-native';
+import { TextInput } from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { Formik } from "formik";
+import { Link, router } from "expo-router";
+
 const AddRide = () => {
+  const onFormSubmit = (values) => {
+    console.log(values);
+    router.replace("/add-ride-preview")
+  };
+
   return (
   <SafeAreaProvider>
         <SafeAreaView>

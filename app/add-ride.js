@@ -1,6 +1,6 @@
 import React from 'react'
 //import MapView from 'react-native-maps';
-import { Button, Text, View } from 'react-native';
+import { Pressable,Button, Text, View } from 'react-native';
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
@@ -30,6 +30,10 @@ const AddRide = () => {
               {({ handleChange, handleBlur, handleSubmit, values }) => (
                 <View className="mt-4 w-full border p-4 flex gap-4">
                   <View>
+                    <Pressable  onPress={()=>{router.push("/map")}} 
+                             className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                <Text className="text-white" >Choose Your Destination</Text>
+                              </Pressable>
                     <Text className="mb-2">Vehicle Type: </Text>
                     <TextInput
                       className="border"

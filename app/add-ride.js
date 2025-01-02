@@ -31,10 +31,10 @@ const AddRide = () => {
                 <View className="mt-4 w-full border p-4 flex gap-4">
                   <View>
                     <Pressable  onPress={()=>{router.push("/map")}} 
-                             className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                <Text className="text-white" >Choose Your Destination</Text>
+                             className=" mb-3 ml-14 mr-14 bg-green-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                <Text className="text-white text-center" >Click Here! Add Ride Locations</Text>
                               </Pressable>
-                    <Text className="mb-2">Vehicle Type: </Text>
+                    <Text className="mb-2 ">Vehicle Type: </Text>
                     <TextInput
                       className="border"
                       onChangeText={handleChange("v_type")}

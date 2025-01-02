@@ -1,31 +1,31 @@
-import React from "react";
-import { FlatList, Text, View } from "react-native";
-const addridepreview = () => {
+import CustomListView from "../components/ride-listview";
+import React, { useState } from "react";
+import { Button, Text, View } from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+const ridepreview = () => {
+  const [data, setData] = useState([
+    { id: 1, title: "Date", description: "1st Ride Details" },
+    { id: 2, title: "Date", description: "2nd Ride Details" },
+  ]);
+
+  const handleItemPress = (item) => {
+    console.log("Item pressed:", item);
+  };
+
   return (
-    <View className="mt-10 flex flex-col justify-between items-center ">
-      <Text className="font-bold text-3xl "> Your Rides </Text>
-      
-      <table class="table-auto">
-        <thead>
-          <tr>
-            <th>Ride Details</th>
-            <th>Date</th>
-            <th>Active Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            
-          </tr>
-          <tr>
-            
-          </tr>
-          <tr>
-            
-          </tr>
-        </tbody>
-      </table>
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView>
+        <View className="m-4 h-screen flex items-center justify-center">
+          <Text className="text-3xl font-bold text-center">Your Rides</Text>
+          <CustomListView
+            data={data}
+            onItemPress={handleItemPress}
+            isLoading={false}
+          />
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
-export default addridepreview;
+
+export default ridepreview;

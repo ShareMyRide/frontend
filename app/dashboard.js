@@ -3,7 +3,9 @@ import { Pressable, Text, View } from "react-native";
 import { Link, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Modal, StyleSheet } from "react-native";
+//
 import { StyleSheet, View, Text, Image, StatusBar } from 'react-native';
+//
 
 const dashboard = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -185,6 +187,7 @@ const styles = StyleSheet.create({
     color: '#4caf50',
   },
 });
+//
 
 export default dashboard;
 

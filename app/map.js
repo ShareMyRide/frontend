@@ -76,3 +76,28 @@ export default function map() {
         </View>
       );
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    map: {
+      flex: 1,
+    },
+    controls: {
+      position: 'absolute',
+      bottom: 10,
+      left: 10,
+      right: 10,
+      backgroundColor: 'white',
+      padding: 10,
+      borderRadius: 8,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: 'gray',
+      marginBottom: 10,
+      padding: 8,
+      borderRadius: 4,
+    },
+  });

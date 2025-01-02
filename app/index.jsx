@@ -7,7 +7,7 @@ export default function App() {
       <Text>Welcome</Text>
       <Text className="text-red-400">Share My Ride</Text>
       
-      <Link href="/register" asChild>
+      <Link href="/introone" asChild>
           <Pressable className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             <Text>Next</Text>
           </Pressable>

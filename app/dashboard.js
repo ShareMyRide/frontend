@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { Link, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Modal, StyleSheet } from "react-native";
+import { StyleSheet, View, Text, Image, StatusBar } from 'react-native';
 
 const dashboard = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -122,4 +123,68 @@ const styles = StyleSheet.create({
   },
 });
 
+//
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <View style={styles.topSection}>
+        <Image
+          source={{
+            uri: 'https://via.placeholder.com/150', 
+          }}
+          style={styles.logo}
+        />
+      </View>
+
+      <View style={styles.content}>
+        <Text style={styles.contentText}>Welcome to the App!</Text>
+      </View>
+
+      <View style={styles.bottomSection}>
+        <Text style={styles.appName}>Share My Ride</Text>
+      </View>
+
+      <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  topSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  content: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentText: {
+    fontSize: 18,
+    color: '#333',
+  },
+  bottomSection: {
+    paddingBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  appName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4caf50',
+  },
+});
+
 export default dashboard;
+

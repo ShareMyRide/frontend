@@ -9,7 +9,7 @@ import { Link,router } from "expo-router";
 const register = () => {
   const onFormSubmit = (values) => {
     console.log(values);
-    router.replace("/dashboard")
+    router.replace("/login")
   };
   return (
 

@@ -7,15 +7,46 @@ import { Link,router } from "expo-router";
 
 
 const register = () => {
-  const onFormSubmit = (values) => {
-    console.log(values);
-    router.replace("/dashboard")
+  const onFormSubmit = async (values) => {
+    try {
+      const response = await fetch("http://localhost:2052/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstname: values.fname,
+          lastname: values.lname,
+          email: values.email,
+          NIC: values.nic,
+          password: values.pswrd,
+          confirmPassword: values.confPswrd,
+          mobileNumber: "1234567890", // Placeholder, update as needed
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Registration failed:", errorData.message);
+        alert(errorData.message || "Registration failed");
+        return;
+      }
+  
+      const data = await response.json();
+      console.log("Registration successful:", data);
+      alert("Registration successful");
+      router.replace("/login");
+    } catch (error) {
+      console.error("Error during registration:", error.message);
+      alert("An error occurred. Please try again.");
+    }
   };
+  
   return (
 
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="m-4 h-screen flex items-center justify-center">
+        <View className="p-4 h-screen flex items-center justify-center  bg-gray-400">
           <Text className="text-3xl font-bold text-center">Register</Text>
           <Formik
             initialValues={{

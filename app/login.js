@@ -86,7 +86,7 @@ const login = () => {
                                   <Text className="text-white text-center">SUBMIT</Text>
                                 </Pressable>
                 <Link href="/register" asChild>
-                  <Text>Haven't an account? Create Account</Text>
+                  <Text className="underline">Haven't an account? Create Account</Text>
                 </Link>
               </View>
             )}

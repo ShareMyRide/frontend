@@ -20,7 +20,7 @@ const introone = () => {
         </Pressable>
 
         <Pressable  onPress={()=>{router.push("/introtwo")}} 
-         className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+         className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             <Text className="text-white" >Next</Text>
           </Pressable>
 

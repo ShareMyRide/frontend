@@ -35,7 +35,7 @@ const dashboard = () => {
           onPress={() => {
             router.push("/add-ride");
           }}
-          className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           <Text className="text-white">Add Ride</Text>
         </Pressable>
@@ -44,7 +44,7 @@ const dashboard = () => {
           onPress={() => {
             router.push("/find-ride");
           }}
-          className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           <Text className="text-white">Find Ride</Text>
         </Pressable>

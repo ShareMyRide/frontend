@@ -16,7 +16,7 @@ const ridepreview = () => {
     <SafeAreaProvider>
       <SafeAreaView>
 
-        <View className="p-4  bg-gray-400 h-screen flex items-center justify-center">
+        <View className="p-4  bg-gray-300 h-screen flex items-center justify-center">
 
           <Text className="text-3xl font-bold text-center">Your Rides</Text>
           <CustomListView

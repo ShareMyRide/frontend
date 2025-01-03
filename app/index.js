@@ -39,7 +39,7 @@ export default function App() {
       <ActivityIndicator size="large" color="#343438" />
       <Pressable
         onPress={() => {
-          router.push("/introtwo");
+          router.push("/introone");
         }}
         className="bg-black mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >

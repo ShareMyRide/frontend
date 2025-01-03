@@ -79,7 +79,7 @@ const login = () => {
                 </View>
                 <Button onPress={handleSubmit} title="Submit" />
                 <Link href="/register" asChild>
-                  <Text>Haven't an account? Create Account</Text>
+                  <Text className="underline">Haven't an account? Create Account</Text>
                 </Link>
               </View>
             )}

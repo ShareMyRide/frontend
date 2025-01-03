@@ -4,7 +4,9 @@ import {  router } from "expo-router";
 
 const review = () =>{
     return(
+
         <View className="mp-10 flex flex-col justify-between items-center  bg-gray-400" >
+
             <Text className="font-bold text-3xl "> Review Details</Text>
             <FlatList className="mt-10"
         data={[

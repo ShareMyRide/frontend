@@ -6,9 +6,11 @@ import { Formik } from "formik";
 import { Link, router } from "expo-router";
 const login = () => {
 
+
   const onFormSubmit = async (values) => {
     try {
       console.log("Submitting login values:", values);
+
 
       const response = await fetch("http://localhost:2052/api/auth/login", {
         method: "POST",
@@ -28,10 +30,12 @@ const login = () => {
         return;
       }
 
+
       const data = await response.json();
       console.log("Login successful:", data);
       alert("Login successful!");
       router.replace("/dashboard");
+
     } catch (error) {
       console.error("Error during login:", error.message);
       alert("An error occurred. Please try again.");

@@ -4,14 +4,17 @@ import { Link,router } from "expo-router";
 
 const dashboard = () => {
   return (
-    <View className="max-w-screen">
-      <Pressable
-              onPress={() => {
-                router.push("/profile")}}
-                className="bg-white flex justify-items-end mt-4 text-white hover:bg-gray-500 font-bold py-1 px-4 rounded">
-                  <Text className="mt-5 text-sm text-right" >Profile</Text>
-            </Pressable>
-      <Text className="mt-5 text-3xl text-center">dashboard</Text>
+    <View className="p-4 bg-gray-400 max-w-screen">
+      <View className="flex flex-row justify-between items-center">
+        <Pressable onPress={toggleMenu}>
+          <Ionicons name="menu" size={30} color="black" />
+        </Pressable>
+        <View className="flex-1 items-center">
+          <Text className="mt-5 text-3xl ">Dashboard</Text>
+        </View>
+      </View>
+
+
       <Text className="mt-5 text-center">
         Find your Ride or Share your Ride
         {"\n"}

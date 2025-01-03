@@ -12,7 +12,9 @@ const dashboard = () => {
   };
 
   return (
-    <View className="max-w-screen">
+
+    <View className="p-4 bg-gray-400 max-w-screen">
+
       <View className="flex flex-row justify-between items-center">
         <Pressable onPress={toggleMenu}>
           <Ionicons name="menu" size={30} color="black" />

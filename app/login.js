@@ -5,10 +5,13 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link, router } from "expo-router";
 const login = () => {
+
+
   const onFormSubmit = async (values) => {
     try {
       console.log("Submitting login values:", values);
-  
+
+
       const response = await fetch("http://localhost:2052/api/auth/login", {
         method: "POST",
         headers: {
@@ -19,28 +22,33 @@ const login = () => {
           password: values.pswrd,
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Login failed:", errorData.message);
         alert(errorData.message || "Login failed");
         return;
       }
-  
+
+
       const data = await response.json();
       console.log("Login successful:", data);
       alert("Login successful!");
-      router.replace("/dashboard"); 
+      router.replace("/dashboard");
+
     } catch (error) {
       console.error("Error during login:", error.message);
       alert("An error occurred. Please try again.");
     }
   };
-  
+
   return (
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="m-4 h-screen flex items-center justify-center">
+        <View
+          className="p-4 h-screen flex items-center justify-center
+         bg-gray-400"
+        >
           <Text className="text-3xl font-bold text-center">Login</Text>
           <Formik
             initialValues={{

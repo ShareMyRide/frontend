@@ -28,7 +28,9 @@ export default function App() {
       className="p-4 h-screen flex items-center justify-center bg-lime-500"
     >
       <Text className="mt-5 text-3xl font-bold text-white">welcome</Text>
-      <Text className="mb-10 text-6xl font-">Share My Ride</Text>
+
+      <Text className="mt-3 mb-10 text-6xl font-semibold">Share My Ride</Text>
+
       <Image
         source={require("../assets/images/ShareMyRide-logo.jpg")}
         style={{ width: 150, height: 150 }}

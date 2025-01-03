@@ -46,7 +46,7 @@ const register = () => {
 
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="m-4 h-screen flex items-center justify-center">
+        <View className="p-4 h-screen flex items-center justify-center  bg-gray-400">
           <Text className="text-3xl font-bold text-center">Register</Text>
           <Formik
             initialValues={{

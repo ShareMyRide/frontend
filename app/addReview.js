@@ -1,18 +1,28 @@
-import React, {useRef, useState} from 'react';
-import {Pressable,Button, DrawerLayoutAndroid, Text, StyleSheet} from 'react-native';
-import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-
+import React, { useRef, useState } from "react";
+import {
+  Pressable,
+  Button,
+  DrawerLayoutAndroid,
+  Text,
+  StyleSheet,
+} from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+//import { Dimensions } from "react-native";
 
 const addReview = () => {
   const drawer = useRef(null);
-  const [drawerPosition, setDrawerPosition] = useState('left');
+  const [drawerPosition, setDrawerPosition] = useState("left");
   const changeDrawerPosition = () => {
-    if (drawerPosition === 'left') {
-      setDrawerPosition('right');
+    if (drawerPosition === "left") {
+      setDrawerPosition("right");
     } else {
-      setDrawerPosition('left');
+      setDrawerPosition("left");
     }
   };
+
+ // const screenWidth = Dimensions.get("window").width;
+ // const drawerWidth = Math.min(screenWidth * 0.8, 300);
+
 
   const navigationView = () => (
     <SafeAreaView style={[styles.container, styles.navigationContainer]}>
@@ -30,7 +40,9 @@ const addReview = () => {
         ref={drawer}
         drawerWidth={300}
         drawerPosition={drawerPosition}
+
         renderNavigationView={navigationView}>
+
         <SafeAreaView style={styles.container}>
           <Text style={styles.paragraph}>Drawer on the {drawerPosition}!</Text>
           <Button
@@ -56,13 +68,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   navigationContainer: {
+
     backgroundColor: '#ecf0f1',
   },
   paragraph: {
     padding: 16,
     fontSize: 15,
-    textAlign: 'center',
+
+    textAlign: "center",
   },
 });
 
 export default addReview;
+
+

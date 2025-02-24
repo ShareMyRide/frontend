@@ -7,15 +7,15 @@ const profile = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="flex flex-col justify-between items-center ">
+        <View className="pt-20 flex flex-col  items-center h-screen text-3xl font-bold">
           <Image
-            source={require("../assets/images/splash-icon.png")}
+            source={require("../assets/images/images.jpeg")}
             style={{ width: 100, height: 100 }}
           />
           <Text>Name: </Text>
           <View className="flex items-center justify-center flex-row gap-10">
             <Link href="/review" asChild>
-              <Text className="text-red-300">Reviews</Text>
+              <Text className="text-red-300 underline">Reviews</Text>
             </Link>
           </View>
 

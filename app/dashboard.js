@@ -12,7 +12,9 @@ const dashboard = () => {
   };
 
   return (
-    <View className="max-w-screen">
+
+    <View className="p-4 bg-gray-400 max-w-screen">
+
       <View className="flex flex-row justify-between items-center">
         <Pressable onPress={toggleMenu}>
           <Ionicons name="menu" size={30} color="black" />
@@ -33,7 +35,7 @@ const dashboard = () => {
           onPress={() => {
             router.push("/add-ride");
           }}
-          className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           <Text className="text-white">Add Ride</Text>
         </Pressable>
@@ -42,20 +44,11 @@ const dashboard = () => {
           onPress={() => {
             router.push("/find-ride");
           }}
-          className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           <Text className="text-white">Find Ride</Text>
         </Pressable>
 
-        <Pressable
-          onPress={() => {
-            router.push("/profile");
-          }}
-          className="bg-red-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-            <Text className="text-white">Profile</Text>
-          
-        </Pressable>
       </View>
 
       <Modal
@@ -84,6 +77,16 @@ const dashboard = () => {
             >
               <View style={styles.menuItem}>
                 <Text>Edit Profile</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                router.push("/add-ride-preview");
+                toggleMenu();
+              }}
+            >
+              <View style={styles.menuItem}>
+                <Text>Your Rides</Text>
               </View>
             </Pressable>
             <Pressable
@@ -122,3 +125,4 @@ const styles = StyleSheet.create({
 });
 
 export default dashboard;
+

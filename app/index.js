@@ -1,50 +1,91 @@
 import {
-  Pressable,
-  Image,
   View,
   Text,
+  Image,
   ActivityIndicator,
+  TouchableOpacity,
   StyleSheet,
+  Dimensions,
 } from "react-native";
-import { useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
+
 export default function App() {
-  /*const navigation = useNavigation();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate('introone'); 
-    }, 2500);
-
-    return () => clearTimeout(timer); 
-  }, []); 
-*/
   return (
-    <View
-      onClick={() => {
-        navigation.navigate("/introone");
-      }}
-      className="p-4 h-screen flex items-center justify-center bg-lime-500"
-    >
-      <Text className="mt-5 text-3xl font-bold text-white">welcome</Text>
-
-      <Text className="mt-3 mb-10 text-6xl font-semibold">Share My Ride</Text>
-
-      <Image
-        source={require("../assets/images/ShareMyRide-logo.jpg")}
-        style={{ width: 150, height: 150 }}
-      />
-      <View />
-      <ActivityIndicator size="large" color="#343438" />
-      <Pressable
-        onPress={() => {
-          router.push("/introone");
-        }}
-        className="bg-black mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.appNameText}>Share My Ride</Text>
+        </View>
+        <Image
+          source={require("../assets/images/ShareMyRide-logo.jpg")}
+          style={styles.logo}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#343438" />
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.nextButton}
+        onPress={() => router.push("/introone")}
       >
-        <Text className="text-white">Next</Text>
-      </Pressable>
+        <Text style={styles.nextButtonText}>Get Started</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const { width } = Dimensions.get("window");
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff3e0",
+    padding: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textContainer: {
+    marginBottom: 50, // Space between text and logo
+  },
+  welcomeText: {
+    fontSize: 30,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#374151",
+    marginBottom: 5, // Space between welcome and app name
+  },
+  appNameText: {
+    fontSize: 50,
+    fontWeight: "semibold",
+    color: "#1f2937",
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    borderRadius: 75,
+  },
+  loadingContainer: {
+    marginTop: 350,     
+  },
+  nextButton: {
+    backgroundColor: "#f97316",
+    paddingVertical: 15,
+    borderRadius: 30,
+    width: width * 0.6,
+    marginBottom: 30,
+    alignSelf: "center",
+  },
+  nextButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

@@ -1,62 +1,39 @@
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
-import { Link, router } from "expo-router";
+import { Image, Pressable, Text, View, StyleSheet } from "react-native";
+import { router } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
-const introone = () => {
+const IntroOne = () => {
   return (
     <SafeAreaProvider>
-      <SafeAreaView>
-        <View className="bg-gray-400 flex flex-col items-center justify-center h-screen mb-3">
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
           <Image
             source={require("../assets/images/mapview1.png")}
-            style={{ width: "100%", height: "50%", resizeMode: "cover" }}
+            style={styles.image}
           />
-          <View className="flex-1 items-center justify-center">
-            <Text className="mt-4 text-4xl text-center ">
+          <View style={styles.content}>
+            <Text style={styles.title}>
               Welcome to ShareMyRide
-              {"\n"}-Your Journey Your Way-
+              {"\n"}- Your Journey, Your Way -
             </Text>
-            <Text className="mt-5 text-1xl text-center">
-              "Welcome to ShareMyRide – Your Journey,{"\n"} Shared. Discover
-              convenient, {"\n"}affordable rides with others heading your way.{" "}
-              {"\n"}Let’s get you moving!"
+            <Text style={styles.description}>
+              "Welcome to ShareMyRide – Your Journey, Shared. Discover
+              convenient, affordable rides with others heading your way.
+              Let’s get you moving!"
             </Text>
-            <View className="flex items-center justify-center flex-row gap-10 mb-5">
+            <View style={styles.buttonContainer}>
               <Pressable
-                onPress={() => {
-                  router.push("/login");
-                }}
-                className="bg-gray-200 mt-4 hover:bg-gray-300 rounded-full"
-                style={{ width: 180, padding: 16, justifyContent: "center" }}
+                onPress={() => router.push("/login")}
+                style={styles.skipButton}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Skip
-                </Text>
+                <Text style={styles.buttonText}>Skip</Text>
               </Pressable>
               <Pressable
-                onPress={() => {
-                  router.push("/introtwo");
-                }}
-                className="bg-orange-600 mt-4 hover:bg-blue-700 rounded-full"
-                style={{ width: 180, padding: 16, justifyContent: "center" }}
+                onPress={() => router.push("/introtwo")}
+                style={styles.nextButton}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: "white",
-                    textAlign: "center",
-                  }}
-                >
-                  Next
-                </Text>
+                <Text style={styles.nextButtonText}>Next</Text>
               </Pressable>
             </View>
           </View>
@@ -66,4 +43,74 @@ const introone = () => {
   );
 };
 
-export default introone;
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5", // Lighter background color
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "50%",
+    resizeMode: "cover",
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#333",
+  },
+  description: {
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 24,
+    color: "#555",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  skipButton: {
+    backgroundColor: "#F0F0F0",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    justifyContent: "center",
+  },
+  nextButton: {
+    backgroundColor: "#f97316",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    color: "#333",
+  },
+  nextButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    color: "white",
+  },
+});
+
+export default IntroOne;

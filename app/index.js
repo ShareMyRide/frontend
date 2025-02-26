@@ -22,7 +22,7 @@ export default function App() {
           style={styles.logo}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#343438" />
+          <ActivityIndicator size="large" color="#333" />
         </View>
       </View>
       <TouchableOpacity
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#fff3e0",
+    backgroundColor: "#E0E0E0", // Previous background color
     padding: 20,
   },
   contentContainer: {
@@ -51,19 +51,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   textContainer: {
-    marginBottom: 50, // Space between text and logo
+    marginBottom: 50,
   },
   welcomeText: {
-    fontSize: 30,
+    fontSize: 28, // Previous font size
     textAlign: "center",
     fontWeight: "bold",
-    color: "#374151",
-    marginBottom: 5, // Space between welcome and app name
+    color: "#333", // Previous text color
+    marginBottom: 5,
   },
   appNameText: {
-    fontSize: 50,
-    fontWeight: "semibold",
-    color: "#1f2937",
+    fontSize: 40, // Adjusted font size
+    fontWeight: "bold",
+    color: "#333", // Previous color
   },
   logo: {
     width: 150,
@@ -72,11 +72,11 @@ const styles = StyleSheet.create({
     borderRadius: 75,
   },
   loadingContainer: {
-    marginTop: 350,     
+    marginTop: 350,
   },
   nextButton: {
-    backgroundColor: "#f97316",
-    paddingVertical: 15,
+    backgroundColor: "#f97316", // Previous button color
+    paddingVertical: 14, // Previous padding
     borderRadius: 30,
     width: width * 0.6,
     marginBottom: 30,
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16, // Previous font size
+    fontWeight: "600", // Previous font weight
     textAlign: "center",
   },
 });

@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#E0E0E0", // Previous background color
+    backgroundColor: "#E0E0E0", 
     padding: 20,
   },
   contentContainer: {
@@ -54,16 +54,16 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   welcomeText: {
-    fontSize: 28, // Previous font size
+    fontSize: 28, 
     textAlign: "center",
     fontWeight: "bold",
-    color: "#333", // Previous text color
+    color: "#333", 
     marginBottom: 5,
   },
   appNameText: {
-    fontSize: 40, // Adjusted font size
+    fontSize: 40, 
     fontWeight: "bold",
-    color: "#333", // Previous color
+    color: "#333", 
   },
   logo: {
     width: 150,
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     marginTop: 350,
   },
   nextButton: {
-    backgroundColor: "#f97316", // Previous button color
-    paddingVertical: 14, // Previous padding
+    backgroundColor: "#f97316", 
+    paddingVertical: 14, 
     borderRadius: 30,
     width: width * 0.6,
     marginBottom: 30,
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: "white",
-    fontSize: 16, // Previous font size
-    fontWeight: "600", // Previous font weight
+    fontSize: 16, 
+    fontWeight: "600", 
     textAlign: "center",
   },
 });

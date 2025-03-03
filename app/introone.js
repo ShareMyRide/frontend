@@ -2,9 +2,16 @@ import React from "react";
 import { Image, Pressable, Text, View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const IntroOne = () => {
   return (
+        <LinearGradient 
+          colors={['#f97316', 'white']}
+          style={styles.container}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        >
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
@@ -40,6 +47,7 @@ const IntroOne = () => {
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
+    </LinearGradient>
   );
 };
 
@@ -49,7 +57,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#9CA3AF", 
     justifyContent: "center",
     alignItems: "center",
   },

@@ -6,47 +6,46 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const IntroOne = () => {
   return (
-        <LinearGradient 
-          colors={['#f97316', 'white']}
-          style={styles.container}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        >
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <Image
-            source={require("../assets/images/mapview1.png")}
-            style={styles.image}
-          />
-          <View style={styles.content}>
-            <Text style={styles.title}>
-              Welcome to ShareMyRide
-              {"\n"}- Your Journey, Your Way -
-            </Text>
-            <Text style={styles.description}>
-              "Welcome to ShareMyRide – Your Journey, Shared. Discover
-              convenient, affordable rides with others heading your way.
-              Let’s get you moving!"
-            </Text>
-            <View style={styles.buttonContainer}>
-              <Pressable
-                onPress={() => router.push("/login")}
-                style={styles.skipButton}
-              >
-                <Text style={styles.buttonText}>Skip</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => router.push("/introtwo")}
-                style={styles.nextButton}
-              >
-                <Text style={styles.nextButtonText}>Next</Text>
-              </Pressable>
+    <LinearGradient
+      colors={['#f97316', 'white']}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.contentContainer}>
+            <Image
+              source={require("../assets/images/mapview1.png")}
+              style={styles.image}
+            />
+            <View style={styles.content}>
+              <Text style={styles.title}>
+                Welcome to ShareMyRide{"\n"}- Your Journey, Your Way -
+              </Text>
+              <Text style={styles.description}>
+                "Welcome to ShareMyRide – Your Journey, Shared. Discover
+                convenient, affordable rides with others heading your way.
+                Let’s get you moving!"
+              </Text>
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  onPress={() => router.push("/login")}
+                  style={[styles.button, styles.skipButton]} // Combine styles
+                >
+                  <Text style={styles.buttonText}>Skip</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => router.push("/introtwo")}
+                  style={[styles.button, styles.nextButton]} // Combine styles
+                >
+                  <Text style={styles.nextButtonText}>Next</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </LinearGradient>
   );
 };
@@ -56,6 +55,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
+    flex: 1,
+  },
+  contentContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -84,6 +86,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 24,
     color: "#555",
+    marginBottom: 55,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -92,19 +95,17 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 20,
   },
-  skipButton: {
-    backgroundColor: "#F0F0F0",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
+  button: { // Base button styles
+    paddingVertical: 18,
+    paddingHorizontal: 85, // Increased horizontal padding
     borderRadius: 30,
     justifyContent: "center",
   },
+  skipButton: {
+    backgroundColor: "#F0F0F0",
+  },
   nextButton: {
     backgroundColor: "#f97316",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,

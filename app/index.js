@@ -8,10 +8,16 @@ import {
   Dimensions,
 } from "react-native";
 import { router } from "expo-router";
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <LinearGradient 
+      colors={['#f97316', 'white']}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
       <View style={styles.contentContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.welcomeText}>Welcome</Text>
@@ -31,7 +37,7 @@ export default function App() {
       >
         <Text style={styles.nextButtonText}>Get Started</Text>
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -42,41 +48,44 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#E0E0E0", 
-    padding: 20,
+    padding: 30, 
   },
   contentContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
+    borderRadius: 10,
+    margin: 20,
+    backgroundColor: 'transparent', 
   },
   textContainer: {
-    marginBottom: 50,
+    marginBottom: 100,
   },
   welcomeText: {
-    fontSize: 28, 
-    textAlign: "center",
+    fontSize: 30,
+    textAlign: "left",
     fontWeight: "bold",
-    color: "#333", 
+    color: "#333",
     marginBottom: 5,
   },
   appNameText: {
-    fontSize: 40, 
+    fontSize: 40,
     fontWeight: "bold",
-    color: "#333", 
+    color: "#333",
   },
   logo: {
     width: 150,
     height: 150,
-    marginBottom: 20,
+    marginBottom: 280,
     borderRadius: 75,
   },
   loadingContainer: {
-    marginTop: 350,
+    marginTop: 60,
   },
   nextButton: {
-    backgroundColor: "#f97316", 
-    paddingVertical: 14, 
+    backgroundColor: "#f97316",
+    paddingVertical: 14,
     borderRadius: 30,
     width: width * 0.6,
     marginBottom: 30,
@@ -84,8 +93,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: "white",
-    fontSize: 16, 
-    fontWeight: "600", 
+    fontSize: 18,
+    fontWeight: "600",
     textAlign: "center",
   },
 });

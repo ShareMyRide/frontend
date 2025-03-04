@@ -12,10 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.sharemyride.app"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +33,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e83daccd-e545-42b0-9523-ea3c254913dc"
+      }
     }
   }
 }

@@ -7,38 +7,38 @@ import { Link, useRouter } from "expo-router";
 const login = () => {
   const router=useRouter();
   const onFormSubmit = async (values) => {
-    // try {
+     try {
       console.log("Submitting login values:", values);
 
 
-      // const response = await fetch("http://localhost:2052/api/auth/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     email: values.email,
-      //     password: values.pswrd,
-      //   }),
-      // });
+       const response = await fetch("http://localhost:2052/api/auth/login", {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           email: values.email,
+           password: values.pswrd,
+         }),
+       });
 
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   console.error("Login failed:", errorData.message);
-      //   alert(errorData.message || "Login failed");
-      //   return;
-      // }
+       if (!response.ok) {
+         const errorData = await response.json();
+         console.error("Login failed:", errorData.message);
+         alert(errorData.message || "Login failed");
+         return;
+       }
 
 
-      // const data = await response.json();
-      // console.log("Login successful:", data);
-      // alert("Login successful!");
+       const data = await response.json();
+       console.log("Login successful:", data);
+       alert("Login successful!");
       router.replace("/dashboard");
 
-    // } catch (error) {
-    //   console.error("Error during login:", error);
-    //   alert("An error occurred. Please try again.");
-    // }
+     } catch (error) {
+       console.error("Error during login:", error);
+       alert("An error occurred. Please try again.");
+     }
   };
 
   return (

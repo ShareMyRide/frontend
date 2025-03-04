@@ -9,56 +9,58 @@ import axios from "axios";
 const register = () => {
   const router=useRouter();
   const onFormSubmit = async (values) => {
-    console.log(values);
+     console.log(values);
     try {
-      // const response = await fetch("http://localhost:2052/api/auth/register", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     firstname: values.fname,
-      //     lastname: values.lname,
-      //     email: values.email,
-      //     NIC: values.nic,
-      //     password: values.pswrd,
-      //     confirmPassword: values.confPswrd,
-      //     mobileNumber: "1234567890", // Placeholder, update as needed
-      //   }),
-      // });
-
-      const response = await axios.post(
-        "http://localhost:2052/api/auth/register",
-        {
-          firstname: values.fname,
-          lastname: values.lname,
-          email: values.email,
-          NIC: values.nic,
+       const response = await fetch("http://localhost:2052/api/auth/register", {
+          method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+         },
+        body: JSON.stringify({
+            firstname: values.fname,
+            lastname: values.lname,
+            email: values.email,
+            NIC: values.nic,
           password: values.pswrd,
-          confirmPassword: values.confPswrd,
-          mobileNumber: "1234567890",
-        }
-      );
+            confirmPassword: values.confPswrd,
+          //  mobileNumber: "1234567890", // Placeholder, update as needed
+          }),
+        });
+
+  //     const response = await axios.post(
+  //       "http://localhost:2052/api/auth/register",
+  //       {
+  //         firstname: values.fname,
+  //         lastname: values.lname,
+  //         email: values.email,
+  //         NIC: values.nic,
+  //         password: values.pswrd,
+  //         confirmPassword: values.confPswrd,
+  //         mobileNumber: "1234567890",
+  //       }
+  //     );
 
       console.log(response.data);
 
 
-      if (!response.ok) {
+       if (!response.ok) {
         const errorData = await response.json();
         console.error("Registration failed:", errorData.message);
-        alert(errorData.message || "Registration failed");
+         alert(errorData.message || "Registration failed");
         return;
       }
 
-      const data = await response.json();
+       const data = await response.json();
       console.log("Registration successful:", data);
-      alert("Registration successful");
+    alert("Registration successful");
       router.replace("/login");
     } catch (error) {
-      console.error("Error during registration:", error.message);
-      alert("An error occurred. Please try again.");
-    }
-  };
+       console.error("Error during registration:", error.message);
+       alert("An error occurred. Please try again.");
+     }
+   };
+
+  
 
   return (
     <SafeAreaProvider>

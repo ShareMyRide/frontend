@@ -3,10 +3,11 @@ import { Pressable, Button, Text, View } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link,router } from "expo-router";
+import { Link,useRouter } from "expo-router";
 
 
 const register = () => {
+  const router=useRouter();
   const onFormSubmit = async (values) => {
     try {
       const response = await fetch("http://localhost:2052/api/auth/register", {
@@ -21,7 +22,7 @@ const register = () => {
           NIC: values.nic,
           password: values.pswrd,
           confirmPassword: values.confPswrd,
-          mobileNumber: "1234567890", // Placeholder, update as needed
+         
         }),
       });
   

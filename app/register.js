@@ -7,61 +7,35 @@ import { Link,useRouter } from "expo-router";
 import axios from "axios";
 
 const register = () => {
-  const router=useRouter();
-  const onFormSubmit = async (values) => {
-     console.log(values);
-    try {
-       const response = await fetch("http://localhost:2052/api/auth/register", {
-          method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-         },
-        body: JSON.stringify({
-            firstname: values.fname,
-            lastname: values.lname,
-            email: values.email,
-            NIC: values.nic,
+ 
+    const router = useRouter(); // Corrected way to use router
+    const onFormSubmit = async (values) => {
+      try {
+        const response = await axios.post("http://localhost:2052/api/auth/register", {  
+        //const response = await axios.post("http://192.168.132.78:2052/api/auth/register", {  // Replace with ur IP
+          firstname: values.fname,
+          lastname: values.lname,
+          email: values.email,
+          NIC: values.nic,
           password: values.pswrd,
-            confirmPassword: values.confPswrd,
-          //  mobileNumber: "1234567890", // Placeholder, update as needed
-          }),
+          confirmPassword: values.confPswrd,
         });
-
-  //     const response = await axios.post(
-  //       "http://localhost:2052/api/auth/register",
-  //       {
-  //         firstname: values.fname,
-  //         lastname: values.lname,
-  //         email: values.email,
-  //         NIC: values.nic,
-  //         password: values.pswrd,
-  //         confirmPassword: values.confPswrd,
-  //         mobileNumber: "1234567890",
-  //       }
-  //     );
-
-      console.log(response.data);
-
-
-       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Registration failed:", errorData.message);
-         alert(errorData.message || "Registration failed");
-        return;
-      }
-
-       const data = await response.json();
-      console.log("Registration successful:", data);
-    alert("Registration successful");
-      router.replace("/login");
-    } catch (error) {
-       console.error("Error during registration:", error.message);
-       alert("An error occurred. Please try again.");
-     }
-   };
-
   
-
+        console.log("Registration successful:", response.data);
+        alert("Registration successful");
+        router.replace("/login"); 
+      } catch (error) {
+        if (error.response) {
+         
+          console.error("Registration failed:", error.response.data.message);
+          alert(error.response.data.message || "Registration failed");
+        } else {
+          
+          console.error("Error during registration:", error.message);
+          alert("An error occurred. Please try again.");
+        }
+      }
+    };
   return (
     <SafeAreaProvider>
       <SafeAreaView>

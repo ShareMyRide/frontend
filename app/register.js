@@ -11,8 +11,8 @@ const register = () => {
     const router = useRouter(); // Corrected way to use router
     const onFormSubmit = async (values) => {
       try {
-        const response = await axios.post("http://localhost:2052/api/auth/register", {  
-        //const response = await axios.post("http://192.168.132.78:2052/api/auth/register", {  // Replace with ur IP
+        //const response = await axios.post("http://localhost:2052/api/auth/register", {  
+        const response = await axios.post("http://192.168.132.78:2052/api/auth/register", {  // Replace with ur IP
           firstname: values.fname,
           lastname: values.lname,
           email: values.email,
@@ -109,20 +109,12 @@ const register = () => {
                   />
                 </View>
               
+                <Button onPress={handleSubmit} title="Submit" />
 
-                <Pressable
-                  onPress={() => {
-                    router.push("/login");
-                  }}
-                  className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  <Text className="text-white text-center">SUBMIT</Text>
-                </Pressable>
-
-                <Link href="/login" asChild>
-                  <Pressable>
-                    <Text className="underline">Already have an account ?</Text>
-                  </Pressable>
+<Link href="/login" asChild>
+  <Pressable>
+    <Text >Already have an account?</Text>
+  </Pressable>
                 </Link>
               </View>
             )}

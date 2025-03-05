@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable,Button, Text, View } from "react-native";
+import { Pressable,Button, Text, View,StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
@@ -11,8 +11,8 @@ const login = () => {
   const onFormSubmit = async (values) => {
     try {
       console.log("Submitting login values:", values);
-      const response = await axios.post("http://localhost:2052/api/auth/login", {
-     // const response = await axios.post("http://192.168.132.78:2052/api/auth/login", {
+      //const response = await axios.post("http://localhost:2052/api/auth/login", {
+      const response = await axios.post("http://192.168.132.78:2052/api/auth/login", {
         email: values.email,
         password: values.pswrd,
       });
@@ -68,16 +68,12 @@ const login = () => {
                     value={values.pswrd}
                   />
                 </View>
-                <Pressable
-                                  onPress={() => {
-                                    router.push("/dashboard");
-                                  }}
-                                  className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                >
-                                  <Text className="text-white text-center">SUBMIT</Text>
-                                </Pressable>
+                <View style={styles.buttonContainer}>
+                <Button onPress={handleSubmit} title="Submit"  />
+                </View>
+                
                 <Link href="/register" asChild>
-                  <Text className="underline">Haven't an account? Create Account</Text>
+                  <Text>Haven't an account? Create Account</Text>
                 </Link>
               </View>
             )}
@@ -87,4 +83,10 @@ const login = () => {
     </SafeAreaProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonContainer:{
+    backgroundColor: "black"
+  }
+})
 export default login;

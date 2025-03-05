@@ -90,34 +90,32 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "center",
     gap: 20,
-    marginTop: 30,
-    marginBottom: 20,
+    marginTop: 20,
   },
-  button: { // Base button styles
-    paddingVertical: 18,
-    paddingHorizontal: 85, // Increased horizontal padding
+  button: { 
+    paddingVertical: 14,
+    paddingHorizontal: 50, 
     borderRadius: 30,
     justifyContent: "center",
   },
   skipButton: {
-    backgroundColor: "#F0F0F0",
+    backgroundColor: "#EEEEEE",
   },
   nextButton: {
-    backgroundColor: "#f97316",
+    backgroundColor: "#F97316",
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "bold",
     textAlign: "center",
     color: "#333",
   },
   nextButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
     color: "white",
+    textAlign: "center",
   },
 });
 

@@ -28,7 +28,7 @@ export default function map() {
             },
           }
         );
-  
+        
         
         const routeCoordinates = response.data.features[0].geometry.coordinates.map(
           ([longitude, latitude]) => ({ latitude, longitude })
@@ -44,7 +44,21 @@ export default function map() {
         Alert.alert('Error', 'Failed to fetch the route.');
       }
     };
+    geocodeCity('kk')
+    const geocodeCity = async (city) => {
+      const apiKey = "AIzaSyAiQ_WJER_3HDCs0B6tH01WPTCzB1COSLA";
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent('polonnaruwa')}&key=${apiKey}`;
+      const response = await fetch(url);
   
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        console.log(data.results[0].geometry.location)
+          return data.results[0].geometry.location;
+      } else {
+          throw new Error(`Coordinates not found for city: ${city}`);
+      }
+  }
+
     return (
         <View style={styles.container}>
           <MapView style={styles.map} initialRegion={{

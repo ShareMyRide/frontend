@@ -31,13 +31,13 @@ const IntroOne = () => {
               <View style={styles.buttonContainer}>
                 <Pressable
                   onPress={() => router.push("/login")}
-                  style={[styles.button, styles.skipButton]} // Combine styles
+                  style={[styles.button, styles.skipButton]} 
                 >
                   <Text style={styles.buttonText}>Skip</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => router.push("/introtwo")}
-                  style={[styles.button, styles.nextButton]} // Combine styles
+                  style={[styles.button, styles.nextButton]} 
                 >
                   <Text style={styles.nextButtonText}>Next</Text>
                 </Pressable>

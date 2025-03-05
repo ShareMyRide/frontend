@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 14,
-    paddingHorizontal: 50, // Widened buttons
+    paddingHorizontal: 50, 
     borderRadius: 30,
     justifyContent: "center",
   },

@@ -62,12 +62,14 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 20,
-    fontSize: 30, // Adjusted from 4xl since direct tailwind conversion can vary
+    fontSize: 30, 
     textAlign: "center",
+    fontWeight: "bold",
+    color: "#333",
   },
   description: {
     marginTop: 20,
-    fontSize: 16, // Adjusted from 1xl
+    fontSize: 16, 
     textAlign: "center",
   },
   buttonContainer: {
@@ -76,11 +78,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   startButton: {
-    backgroundColor: "#F97316", // Using 'orange' directly as 'orange-600' might not be directly available
+    backgroundColor: "#F97316", 
     width: 200,
     padding: 16,
     justifyContent: "center",
-    borderRadius: 999, //rounded full
+    borderRadius: 999, 
   },
   buttonText: {
     fontSize: 18,

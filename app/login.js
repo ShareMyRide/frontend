@@ -56,7 +56,7 @@ const login = () => {
         <View
           className="p-4 h-screen flex items-center justify-center"
         >
-          <Text className="text-3xl font-bold text-center">Login</Text>
+          <Text className="text-4xl font-bold text-center">Login</Text>
           <Formik
             initialValues={{
               email: "",
@@ -65,9 +65,9 @@ const login = () => {
             onSubmit={onFormSubmit}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <View className="mt-4 w-full border p-4 flex gap-4">
+              <View className="mt-4 w-full border p-5 flex gap-4">
                 <View>
-                  <Text className="mb-2">E-mail: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>E-mail: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("email")}
@@ -76,7 +76,7 @@ const login = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2" >Password : </Text>
+                  <Text className="mb-2" style={styles.textLabel}>Password : </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("pswrd")}
@@ -109,5 +109,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  textLabel: {
+    fontWeight: "bold",
+  }
 });
 export default login;

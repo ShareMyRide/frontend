@@ -1,9 +1,11 @@
 import React from "react";
-import { Pressable,Button, Text, View } from "react-native";
+import { Pressable,Button, Text, View, StyleSheet} from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link, router } from "expo-router";
+import { LinearGradient } from 'expo-linear-gradient';
+
 const login = () => {
 
 
@@ -43,11 +45,16 @@ const login = () => {
   };
 
   return (
+     <LinearGradient
+              colors={['#f97316', 'white']}
+              style={styles.container}
+              start={{ x: 1.5, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
     <SafeAreaProvider>
       <SafeAreaView>
         <View
-          className="p-4 h-screen flex items-center justify-center
-         bg-gray-300"
+          className="p-4 h-screen flex items-center justify-center"
         >
           <Text className="text-3xl font-bold text-center">Login</Text>
           <Formik
@@ -69,7 +76,7 @@ const login = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">Password : </Text>
+                  <Text className="mb-2" >Password : </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("pswrd")}
@@ -94,6 +101,13 @@ const login = () => {
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 export default login;

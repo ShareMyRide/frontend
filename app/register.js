@@ -1,10 +1,11 @@
 import React from "react";
-import { Pressable, Button, Text, View } from "react-native";
+import { Pressable, Button, Text, View, StyleSheet  } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link,useRouter } from "expo-router";
 import axios from "axios";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const register = () => {
   const router=useRouter();
@@ -63,10 +64,16 @@ const register = () => {
   
 
   return (
+    <LinearGradient
+        colors={['#f97316', 'white']}
+        style={styles.container}
+        start={{ x: 1.5, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="p-4 h-screen flex items-center justify-center  bg-gray-400">
-          <Text className="text-3xl font-bold text-center">Register</Text>
+        <View className="p-4 h-screen flex items-center justify-center  ">
+          <Text className="text-4xl font-bold text-center">Register</Text>
           <Formik
             initialValues={{
               fname: "",
@@ -81,7 +88,7 @@ const register = () => {
             {({ handleChange, handleBlur, handleSubmit, values }) => (
               <View className="mt-4 w-full border p-4 flex gap-4">
                 <View>
-                  <Text className="mb-2">First Name: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>First Name: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("fname")}
@@ -90,7 +97,7 @@ const register = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">Last Name: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>Last Name: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("lname")}
@@ -99,7 +106,7 @@ const register = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">E-mail: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>E-mail: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("email")}
@@ -108,7 +115,7 @@ const register = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">NIC number: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>NIC number: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("nic")}
@@ -117,7 +124,7 @@ const register = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">Password : </Text>
+                  <Text className="mb-2" style={styles.textLabel}>Password : </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("pswrd")}
@@ -126,7 +133,7 @@ const register = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2"> Confirm Password :</Text>
+                  <Text className="mb-2" style={styles.textLabel}> Confirm Password :</Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("confPswrd")}
@@ -147,7 +154,7 @@ const register = () => {
 
                 <Link href="/login" asChild>
                   <Pressable>
-                    <Text className="underline">Already have an account ?</Text>
+                    <Text className="underline" style={styles.textLabel}>Already have an account ?</Text>
                   </Pressable>
                 </Link>
               </View>
@@ -156,6 +163,17 @@ const register = () => {
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  textLabel: {
+    fontWeight: "bold",
+  }
+});
+
 export default register;

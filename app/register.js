@@ -12,7 +12,7 @@ const register = () => {
     const onFormSubmit = async (values) => {
       try {
         //const response = await axios.post("http://localhost:2052/api/auth/register", {  
-        const response = await axios.post("http://192.168.132.78:2052/api/auth/register", {  // Replace with ur IP
+        const response = await axios.post("http://192.168.222.127:2052/api/auth/register", {  // Replace with ur IP
           firstname: values.fname,
           lastname: values.lname,
           email: values.email,

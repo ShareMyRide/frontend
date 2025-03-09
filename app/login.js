@@ -12,7 +12,9 @@ const login = () => {
     try {
       console.log("Submitting login values:", values);
       //const response = await axios.post("http://localhost:2052/api/auth/login", {
-      const response = await axios.post("http://192.168.132.78:2052/api/auth/login", {
+      const response = await axios.post("http://192.168.222.127:2052/api/auth/login", {
+
+        
         email: values.email,
         password: values.pswrd,
       });

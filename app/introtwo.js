@@ -83,11 +83,11 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     gap: 20,
-    marginTop: 30,
+    marginTop: 20,
   },
   button: {
     paddingVertical: 14,
-    paddingHorizontal: 50, // Widened buttons
+    paddingHorizontal: 50, 
     borderRadius: 30,
     justifyContent: "center",
   },

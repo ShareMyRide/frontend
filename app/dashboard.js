@@ -3,6 +3,7 @@ import { Pressable, Text, View, Modal, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import BottomNavi from "./bottom-navi";
 
 const Dashboard = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -97,6 +98,9 @@ const Dashboard = () => {
               </View>
             </View>
           </Modal>
+          <View>
+                <BottomNavi/>
+          </View>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

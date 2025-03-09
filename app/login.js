@@ -1,47 +1,40 @@
 import React from "react";
-import { Pressable,Button, Text, View, StyleSheet} from "react-native";
+import { Pressable,Button, Text, View,StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link, router } from "expo-router";
-import { LinearGradient } from 'expo-linear-gradient';
-
+import { Link, useRouter } from "expo-router";
+import axios from "axios";
 const login = () => {
-
+  const router = useRouter();
 
   const onFormSubmit = async (values) => {
-    // try {
+    try {
+
       console.log("Submitting login values:", values);
+      //const response = await axios.post("http://localhost:2052/api/auth/login", {
+      const response = await axios.post("http://192.168.222.127:2052/api/auth/login", {
 
+        
+        email: values.email,
+        password: values.pswrd,
+      });
 
-      // const response = await fetch("http://localhost:2052/api/auth/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     email: values.email,
-      //     password: values.pswrd,
-      //   }),
-      // });
+      console.log("Login successful:", response.data);
+      alert("Login successful!");
+      router.replace("/dashboard"); 
+    } catch (error) {
+      if (error.response) {
+        
+        console.error("Login failed:", error.response.data.message);
+        alert(error.response.data.message || "Login failed");
+      } else {
+       
+        console.error("Error during login:", error.message);
+        alert("An error occurred. Please try again.");
+      }
+    }
 
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   console.error("Login failed:", errorData.message);
-      //   alert(errorData.message || "Login failed");
-      //   return;
-      // }
-
-
-      // const data = await response.json();
-      // console.log("Login successful:", data);
-      // alert("Login successful!");
-      router.replace("/dashboard");
-
-    // } catch (error) {
-    //   console.error("Error during login:", error);
-    //   alert("An error occurred. Please try again.");
-    // }
   };
 
   return (
@@ -84,16 +77,14 @@ const login = () => {
                     value={values.pswrd}
                   />
                 </View>
-                <Pressable
-                                  onPress={() => {
-                                    router.push("/dashboard");
-                                  }}
-                                  className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                >
-                                  <Text className="text-white text-center">SUBMIT</Text>
-                                </Pressable>
+                <View style={styles.buttonContainer}>
+                <Button onPress={handleSubmit} title="Submit"  />
+                </View>
+                
                 <Link href="/register" asChild>
-                  <Text className="underline"  style={styles.textLabel}>Haven't an account? Create Account</Text>
+
+                  <Text>Haven't an account? Create Account</Text>
+
                 </Link>
               </View>
             )}
@@ -106,11 +97,10 @@ const login = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  textLabel: {
-    fontWeight: "bold",
+
+  buttonContainer:{
+    backgroundColor: "black"
   }
-});
+})
+
 export default login;

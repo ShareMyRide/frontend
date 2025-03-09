@@ -5,6 +5,8 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link, useRouter } from "expo-router";
 import axios from "axios";
+import { LinearGradient } from 'expo-linear-gradient';
+
 const login = () => {
   const router = useRouter();
 
@@ -100,7 +102,12 @@ const styles = StyleSheet.create({
 
   buttonContainer:{
     backgroundColor: "black"
-  }
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5", 
+    padding: 20,
+  },
 })
 
 export default login;

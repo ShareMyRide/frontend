@@ -13,7 +13,7 @@ const register = () => {
     try {
       //const response = await axios.post("http://localhost:2052/api/auth/register", {
       const response = await axios.post(
-        "http://192.168.222.127:2052/api/auth/register",
+        "http://192.168.216.78:2052/api/auth/register",
         {
           // Replace with ur IP
           firstname: values.fname,

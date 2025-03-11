@@ -6,6 +6,7 @@ import { Formik } from "formik";
 import { Link, useRouter } from "expo-router";
 import axios from "axios";
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const login = () => {
   const router = useRouter();
@@ -15,12 +16,16 @@ const login = () => {
 
       console.log("Submitting login values:", values);
       //const response = await axios.post("http://localhost:2052/api/auth/login", {
-      const response = await axios.post("http://192.168.222.127:2052/api/auth/login", {
+      const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
 
         
         email: values.email,
         password: values.pswrd,
       });
+      const { token, user } = response.data;
+
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("userId", user.id);
 
       console.log("Login successful:", response.data);
       alert("Login successful!");

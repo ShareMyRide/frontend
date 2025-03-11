@@ -1,9 +1,42 @@
-import React from "react";
-import { Image, Text, View, StyleSheet, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, Text, View, StyleSheet, ScrollView,ActivityIndicator} from "react-native";
 import { Link } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const Profile = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const userId = await AsyncStorage.getItem("userId");
+
+      if (!token || !userId) {
+        return alert("Not logged in!");
+      }
+
+      const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUserData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -13,26 +46,26 @@ const Profile = () => {
               source={require("../assets/images/images.jpeg")}
               style={styles.profileImage}
             />
-            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileName}>{userData.firstname} {userData.lastname}</Text>
           </View>
 
           <View style={styles.profileDetails}>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>John Michael Doe</Text>
+                <Text style={styles.detailValue}>{userData.firstname} {userData.lastname}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>john.doe@example.com</Text>
+                <Text style={styles.detailValue}>{userData.email}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
-              <Text style={styles.detailLabel}>Phone Number:</Text>
+              <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>+1 (555) 123-4567</Text>
+                <Text style={styles.detailValue}>{userData.NIC}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>

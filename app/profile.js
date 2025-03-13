@@ -21,7 +21,7 @@ const Profile = () => {
     vehicle: "2022 Honda Civic, License Plate: ABC-1234",
     imageUrl: require("../assets/images/images.jpeg"),
     isEditing: false,
-    nicNumber: "123456789V", // Added NIC number
+    nicNumber: "123456789V",
   });
 
   const handleEditToggle = () => {

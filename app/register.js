@@ -8,36 +8,35 @@ import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 
 const register = () => {
-  const router = useRouter(); // Corrected way to use router
+  const router = useRouter(); 
   const onFormSubmit = async (values) => {
     try {
-      //const response = await axios.post("http://localhost:2052/api/auth/register", {
-      const response = await axios.post(
-        "http://192.168.216.78:2052/api/auth/register",
-        {
-          // Replace with ur IP
-          firstname: values.fname,
-          lastname: values.lname,
-          email: values.email,
-          NIC: values.nic,
-          password: values.pswrd,
-          confirmPassword: values.confPswrd,
-        }
-      );
+      //const response = await axios.post("http://localhost:2052/api/auth/register", {  
+      const response = await axios.post("http://192.168.151.78:2052/api/auth/register", {  // Replace with ur IP
+        firstname: values.fname,
+        lastname: values.lname,
+        email: values.email,
+        NIC: values.nic,
+        password: values.pswrd,
+        confirmPassword: values.confPswrd,
+      });
 
       console.log("Registration successful:", response.data);
       alert("Registration successful");
-      router.replace("/login");
+      router.replace("/bottom-navi"); 
     } catch (error) {
       if (error.response) {
+       
         console.error("Registration failed:", error.response.data.message);
         alert(error.response.data.message || "Registration failed");
       } else {
+        
         console.error("Error during registration:", error.message);
         alert("An error occurred. Please try again.");
       }
     }
   };
+
   return (
     <LinearGradient
       colors={["#f97316", "white"]}
@@ -130,7 +129,14 @@ const register = () => {
                     />
                   </View>
 
-                  <Button onPress={handleSubmit} title="Submit" />
+                  <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={styles.submitButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.buttonText}>SUBMIT</Text>
+                  </Pressable>
+                </View>
 
                   <Link href="/login" asChild>
                     <Pressable>
@@ -153,6 +159,21 @@ const styles = StyleSheet.create({
   },
   textLabel: {
     fontWeight: "bold",
+  },
+  buttonContainer: {
+    marginVertical: 10
+  },
+  submitButton: {
+    backgroundColor: "#f97316", 
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+   // borderRadius: 15,
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 

@@ -1,116 +1,146 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pressable, Text, View, Modal, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import BottomNavi from "./bottom-navi";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Dashboard = () => {
+const Dashboard = ({ user }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [userData, setUserData] = useState(user);
+  
+  useEffect(() => {
+    console.log("Dashboard received user:", user);
+    // If no user data is passed as prop, try to get it from AsyncStorage
+    const getUserData = async () => {
+      if (!user) {
+        try {
+          const storedUserData = await AsyncStorage.getItem("userData");
+          if (storedUserData) {
+            setUserData(JSON.parse(storedUserData));
+          }
+        } catch (error) {
+          console.error("Error retrieving user data:", error);
+        }
+      }
+    };
+    
+    getUserData();
+  }, [user]);
 
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
 
+  const navigateToProfile = async () => {
+    try {
+      // Get the latest user data from AsyncStorage
+      const storedUserData = await AsyncStorage.getItem("userData");
+      
+      // Navigate to profile with user data
+      router.push({
+        pathname: "/profile",
+        params: { user: storedUserData || JSON.stringify(userData) }
+      });
+      
+      toggleMenu();
+    } catch (error) {
+      console.error("Error navigating to profile:", error);
+      // Fallback navigation without parameters
+      router.push("/profile");
+      toggleMenu();
+    }
+  };
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Pressable onPress={toggleMenu} style={styles.menuButton}>
-              <Ionicons name="menu" size={30} color="#333" />
-            </Pressable>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>Dashboard</Text>
-            </View>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Pressable onPress={toggleMenu} style={styles.menuButton}>
+          <Ionicons name="menu" size={30} color="#333" />
+        </Pressable>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Dashboard</Text>
+        </View>
+      </View>
 
-          <Text style={styles.instructionText}>
-            Find your Ride or Share your Ride
-            {"\n"}
-            Turn On your Location
+      {/* Display user information if available */}
+      {userData && (
+        <View style={styles.userInfo}>
+          <Text style={styles.welcomeText}>
+            Welcome, {userData.username || userData.firstname || userData.name || "User"}
           </Text>
+          <Text style={styles.emailText}>{userData.email}</Text>
+        </View>
+      )}
 
-          <View style={styles.buttonContainer}>
-            <Pressable
-              onPress={() => router.push("/add-ride")}
-              style={styles.actionButton}
-            >
-              <Text style={styles.actionButtonText}>Add Ride</Text>
-            </Pressable>
+      <Text style={styles.instructionText}>
+        Find your Ride or Share your Ride
+        {"\n"}
+        Turn On your Location
+      </Text>
 
-            <Pressable
-              onPress={() => router.push("/find-ride")}
-              style={styles.actionButton}
-            >
-              <Text style={styles.actionButtonText}>Find Ride</Text>
-            </Pressable>
-          </View>
+      <View style={styles.buttonContainer}>
+        <Pressable
+          onPress={() => router.push("/add-ride")}
+          style={styles.actionButton}
+        >
+          <Text style={styles.actionButtonText}>Add Ride</Text>
+        </Pressable>
 
-          <Modal
-            visible={isMenuVisible}
-            animationType="slide"
-            transparent={true}
-            onRequestClose={toggleMenu}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Pressable
-                  onPress={() => {
-                    router.push("/profile");
-                    toggleMenu();
-                  }}
-                >
-                  <View style={styles.menuItem}>
-                    <Text style={styles.menuItemText}>View Profile</Text>
-                  </View>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    router.push("/profile");
-                    toggleMenu();
-                  }}
-                >
-                  <View style={styles.menuItem}>
-                    <Text style={styles.menuItemText}>Edit Profile</Text>
-                  </View>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    router.push("/add-ride-preview");
-                    toggleMenu();
-                  }}
-                >
-                  <View style={styles.menuItem}>
-                    <Text style={styles.menuItemText}>Your Rides</Text>
-                  </View>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    router.push("/login");
-                    toggleMenu();
-                  }}
-                >
-                  <View style={styles.menuItem}>
-                    <Text style={styles.menuItemText}>Logout</Text>
-                  </View>
-                </Pressable>
+        <Pressable
+          onPress={() => router.push("/find-ride")}
+          style={styles.actionButton}
+        >
+          <Text style={styles.actionButtonText}>Find Ride</Text>
+        </Pressable>
+      </View>
+
+      <Modal
+        visible={isMenuVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={toggleMenu}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Pressable onPress={navigateToProfile}>
+              <View style={styles.menuItem}>
+                <Text style={styles.menuItemText}>View Profile</Text>
               </View>
-            </View>
-          </Modal>
-          <View>
-                <BottomNavi/>
+            </Pressable>
+            <Pressable onPress={navigateToProfile}>
+              <View style={styles.menuItem}>
+                <Text style={styles.menuItemText}>Edit Profile</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                router.push("/add-ride-preview");
+                toggleMenu();
+              }}
+            >
+              <View style={styles.menuItem}>
+                <Text style={styles.menuItemText}>Your Rides</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                router.push("/login");
+                toggleMenu();
+              }}
+            >
+              <View style={styles.menuItem}>
+                <Text style={styles.menuItemText}>Logout</Text>
+              </View>
+            </Pressable>
           </View>
         </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5", 
@@ -133,6 +163,28 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
+  },
+  userInfo: {
+    alignItems: "center",
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  welcomeText: {
+    fontSize: 18,
+    color: "#333",
+    fontWeight: "500",
+  },
+  emailText: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
   },
   instructionText: {
     textAlign: "center",

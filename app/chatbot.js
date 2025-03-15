@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-// In your React Native code
 const API_URL = 'http://192.168.230.205:2052/api/chatbot'; 
 
 const ChatbotApp = () => {
@@ -30,7 +29,7 @@ const ChatbotApp = () => {
   const [inputMode, setInputMode] = useState('default'); // 'default', 'custom'
 
   useEffect(() => {
-  
+    // Fetch categories when component mounts
     fetchCategories();
   }, []);
 
@@ -59,7 +58,7 @@ const ChatbotApp = () => {
     setAnswer(null);
     setInputMode('default');
     
-   
+    // Add user message
     setMessages(prev => [...prev, {
       id: Date.now(),
       text: `I'd like to know about ${category}`,
@@ -72,7 +71,7 @@ const ChatbotApp = () => {
       if (response.data.questions) {
         setQuestions(response.data.questions);
         
-        
+        // Add bot message with category selection
         setMessages(prev => [...prev, {
           id: Date.now(),
           text: `Here are some common questions about ${category}:`,
@@ -96,7 +95,7 @@ const ChatbotApp = () => {
   const handleQuestionSelect = async (question) => {
     setSelectedQuestion(question);
     
-   
+    // Add user message
     setMessages(prev => [...prev, {
       id: Date.now(),
       text: question,
@@ -120,11 +119,11 @@ const ChatbotApp = () => {
           isUser: false
         }]);
       } else if (response.data.message) {
-       
+        // If no answer was found, show suggestion to send custom message
         setAnswer(null);
         setInputMode('custom');
         
-       
+        // Add bot message suggesting custom message
         setMessages(prev => [...prev, {
           id: Date.now(),
           text: response.data.message,
@@ -146,7 +145,7 @@ const ChatbotApp = () => {
   const handleCustomMessageSubmit = async () => {
     if (!customMessage.trim()) return;
     
-    
+    // Add user message
     setMessages(prev => [...prev, {
       id: Date.now(),
       text: customMessage,
@@ -161,14 +160,14 @@ const ChatbotApp = () => {
       });
       
       if (response.data.message) {
-       
+        // Add bot confirmation message
         setMessages(prev => [...prev, {
           id: Date.now(),
           text: response.data.message,
           isUser: false
         }]);
         
-        
+        // Reset input
         setCustomMessage('');
         setInputMode('default');
       }
@@ -229,7 +228,9 @@ const ChatbotApp = () => {
     >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>ShareMyRide Assistant</Text>
-        
+        {/* <TouchableOpacity style={styles.resetButton} onPress={resetChat}>
+          <Text style={styles.resetButtonText}>New Chat</Text>
+        </TouchableOpacity> */}
       </View>
       
       <FlatList
@@ -309,8 +310,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
-    justifyContent:'center',
-   
   },
   resetButton: {
     padding: 8,

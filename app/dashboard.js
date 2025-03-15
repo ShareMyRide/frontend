@@ -65,9 +65,7 @@ const Dashboard = ({ user }) => {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Dashboard</Text>
         </View>
-        <Pressable onPress={navigateToChatbot} style={styles.chatbotButton}>
-          <Ionicons name="chatbubble-ellipses" size={28} color="#f97316" />
-        </Pressable>
+       
       </View>
 
       {/* Display user information if available */}

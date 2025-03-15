@@ -248,17 +248,20 @@ const ChatbotApp = () => {
       
       <View style={styles.inputContainer}>
         {!selectedCategory && !loading ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
-            {categories.map((category, index) => (
-              <TouchableOpacity
+         // In your React Native code, modify the categories section
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+        {categories
+            .filter(category => category !== "Custom Message") // Filter out "Custom Message"
+            .map((category, index) => (
+            <TouchableOpacity
                 key={index}
                 style={styles.categoryButton}
                 onPress={() => handleCategorySelect(category)}
-              >
+            >
                 <Text style={styles.categoryButtonText}>{category}</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
             ))}
-          </ScrollView>
+        </ScrollView>
         ) : inputMode === 'custom' ? (
           <View style={styles.customMessageContainer}>
             <TextInput

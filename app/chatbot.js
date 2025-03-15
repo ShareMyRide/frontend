@@ -1,250 +1,422 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  FlatList, 
+  TextInput, 
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator
+} from 'react-native';
 import axios from 'axios';
 
-const ChatBot = () => {
-  const [messages, setMessages] = useState([
-    { 
-      type: 'bot', 
-      content: 'Welcome to ShareMyRide support! Please select a category to get started.'
-    }
-  ]);
-  const [categories, setCategories] = useState([]);
-  const [questions, setQuestions] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [customMessage, setCustomMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+// In your React Native code
+const API_URL = 'http://192.168.230.205:2052/api/chatbot'; 
 
-  // Load categories when component mounts
+const ChatbotApp = () => {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [answer, setAnswer] = useState(null);
+  const [customMessage, setCustomMessage] = useState('');
+  const [messages, setMessages] = useState([
+    { id: 1, text: 'Welcome to ShareMyRide! How can I help you today?', isUser: false }
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [inputMode, setInputMode] = useState('default'); // 'default', 'custom'
+
   useEffect(() => {
+    // Fetch categories when component mounts
     fetchCategories();
   }, []);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const fetchCategories = async () => {
     try {
-      setIsTyping(true);
-      const response = await axios.post('/chatbot', {});
-      setCategories(response.data.categories);
-      setIsTyping(false);
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/chatbot`, {});
+      if (response.data.categories) {
+        setCategories(response.data.categories);
+      }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setMessages([...messages, { 
-        type: 'bot', 
-        content: 'Sorry, I encountered an error. Please try again later.' 
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: 'Sorry, there was an error connecting to the server.',
+        isUser: false
       }]);
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
   const handleCategorySelect = async (category) => {
     setSelectedCategory(category);
-    setMessages([...messages, { type: 'user', content: `Category: ${category}` }]);
+    setSelectedQuestion(null);
+    setAnswer(null);
+    setInputMode('default');
+    
+    // Add user message
+    setMessages(prev => [...prev, {
+      id: Date.now(),
+      text: `I'd like to know about ${category}`,
+      isUser: true
+    }]);
     
     try {
-      setIsTyping(true);
-      const response = await axios.post('http://192.168.230.205:2052/api/auth/chatbot', { category });
-      setQuestions(response.data.questions);
-      
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: `Here are some common questions about ${category}:`,
-        isQuestionList: true,
-        questions: response.data.questions
-      }]);
-      setIsTyping(false);
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/chatbot`, { category });
+      if (response.data.questions) {
+        setQuestions(response.data.questions);
+        
+        // Add bot message with category selection
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          text: `Here are some common questions about ${category}:`,
+          isUser: false,
+          isQuestionList: true,
+          questions: response.data.questions
+        }]);
+      }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching questions:', error);
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: 'Sorry, I encountered an error. Please try again later.' 
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: 'Sorry, there was an error fetching questions for this category.',
+        isUser: false
       }]);
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
   const handleQuestionSelect = async (question) => {
-    setMessages([...messages, { type: 'user', content: question }]);
+    setSelectedQuestion(question);
+    
+    // Add user message
+    setMessages(prev => [...prev, {
+      id: Date.now(),
+      text: question,
+      isUser: true
+    }]);
     
     try {
-      setIsTyping(true);
-      const response = await axios.post('/chatbot', { 
-        category: selectedCategory, 
-        question 
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/chatbot`, {
+        category: selectedCategory,
+        question
       });
       
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: response.data.answer || response.data.message 
-      }]);
-      
-      if (response.data.message) {
-        // Question wasn't found, prompt for custom message
-        setMessages(prev => [...prev, { 
-          type: 'bot', 
-          content: 'Would you like to send a custom message to our team?' 
+      if (response.data.answer) {
+        setAnswer(response.data.answer);
+        
+        // Add bot message with answer
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          text: response.data.answer,
+          isUser: false
+        }]);
+      } else if (response.data.message) {
+        // If no answer was found, show suggestion to send custom message
+        setAnswer(null);
+        setInputMode('custom');
+        
+        // Add bot message suggesting custom message
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          text: response.data.message,
+          isUser: false
         }]);
       }
-      setIsTyping(false);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching answer:', error);
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: 'Sorry, I encountered an error. Please try again later.' 
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: 'Sorry, there was an error getting the answer to your question.',
+        isUser: false
       }]);
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
-  const handleCustomMessageSubmit = async (e) => {
-    e.preventDefault();
+  const handleCustomMessageSubmit = async () => {
     if (!customMessage.trim()) return;
     
-    setMessages([...messages, { type: 'user', content: customMessage }]);
-    setCustomMessage('');
+    // Add user message
+    setMessages(prev => [...prev, {
+      id: Date.now(),
+      text: customMessage,
+      isUser: true
+    }]);
     
     try {
-      setIsTyping(true);
-      const response = await axios.post('/chatbot', {
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/chatbot`, {
         category: selectedCategory || 'Custom Message',
-        customMessage
+        customMessage: customMessage
       });
       
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: response.data.message 
-      }]);
-
-      // Reset back to categories after submitting custom message
-      setSelectedCategory('');
-      fetchCategories();
-      setIsTyping(false);
+      if (response.data.message) {
+        // Add bot confirmation message
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          text: response.data.message,
+          isUser: false
+        }]);
+        
+        // Reset input
+        setCustomMessage('');
+        setInputMode('default');
+      }
+      setLoading(false);
     } catch (error) {
       console.error('Error submitting custom message:', error);
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: 'Sorry, I encountered an error submitting your message. Please try again later.' 
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: 'Sorry, there was an error submitting your message.',
+        isUser: false
       }]);
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
   const resetChat = () => {
-    setMessages([{ 
-      type: 'bot', 
-      content: 'Welcome to ShareMyRide support! Please select a category to get started.' 
-    }]);
-    setSelectedCategory('');
+    setSelectedCategory(null);
     setQuestions([]);
-    fetchCategories();
+    setSelectedQuestion(null);
+    setAnswer(null);
+    setCustomMessage('');
+    setMessages([
+      { id: 1, text: 'Welcome to ShareMyRide! How can I help you today?', isUser: false }
+    ]);
+    setInputMode('default');
+  };
+
+  const renderMessage = ({ item }) => {
+    if (item.isQuestionList) {
+      return (
+        <View style={[styles.messageContainer, !item.isUser && styles.botMessageContainer]}>
+          <Text style={styles.messageText}>{item.text}</Text>
+          {item.questions.map((q, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.questionButton}
+              onPress={() => handleQuestionSelect(q)}
+            >
+              <Text style={styles.questionButtonText}>{q}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      );
+    }
+    
+    return (
+      <View style={[styles.messageContainer, item.isUser ? styles.userMessageContainer : styles.botMessageContainer]}>
+        <Text style={styles.messageText}>{item.text}</Text>
+      </View>
+    );
   };
 
   return (
-    <div className="flex flex-col h-full max-w-md mx-auto bg-gray-100 shadow-lg rounded-lg overflow-hidden">
-      {/* Header */}
-      <div className="bg-blue-500 text-white px-4 py-3 flex justify-between items-center">
-        <h3 className="text-lg font-semibold">ShareMyRide Support</h3>
-        <button 
-          onClick={resetChat}
-          className="text-sm bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded"
-        >
-          New Chat
-        </button>
-      </div>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>ShareMyRide Assistant</Text>
+        <TouchableOpacity style={styles.resetButton} onPress={resetChat}>
+          <Text style={styles.resetButtonText}>New Chat</Text>
+        </TouchableOpacity>
+      </View>
       
-      {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-        {messages.map((message, index) => (
-          <div key={index} className={`mb-4 ${message.type === 'user' ? 'text-right' : ''}`}>
-            <div 
-              className={`
-                inline-block px-4 py-2 rounded-lg max-w-xs lg:max-w-md
-                ${message.type === 'user' 
-                  ? 'bg-yellow-400 text-gray-800' 
-                  : 'bg-white text-gray-800 shadow'
-                }
-              `}
-            >
-              {message.content}
-              
-              {message.isQuestionList && (
-                <ul className="mt-2 space-y-1">
-                  {message.questions.map((q, qIndex) => (
-                    <li key={qIndex}>
-                      <button
-                        onClick={() => handleQuestionSelect(q)}
-                        className="text-left text-blue-600 hover:text-blue-800 hover:underline w-full"
-                      >
-                        {q}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        ))}
-        
-        {isTyping && (
-          <div className="mb-4">
-            <div className="inline-block px-4 py-2 rounded-lg bg-white text-gray-800 shadow">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-75"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
+      <FlatList
+        data={messages}
+        renderItem={renderMessage}
+        keyExtractor={item => item.id.toString()}
+        style={styles.messagesContainer}
+        contentContainerStyle={styles.messagesList}
+      />
       
-      {/* Input or Categories */}
-      <div className="border-t border-gray-200 p-4 bg-white">
-        {!selectedCategory ? (
-          <div>
-            <p className="text-sm text-gray-500 mb-2">Select a category:</p>
-            <div className="grid grid-cols-2 gap-2">
-              {categories.map((category, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleCategorySelect(category)}
-                  className="bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 px-3 rounded text-sm transition-colors"
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <form onSubmit={handleCustomMessageSubmit} className="flex">
-            <input
-              type="text"
-              value={customMessage}
-              onChange={(e) => setCustomMessage(e.target.value)}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FF9500" />
+        </View>
+      )}
+      
+      <View style={styles.inputContainer}>
+        {!selectedCategory && !loading ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+            {categories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.categoryButton}
+                onPress={() => handleCategorySelect(category)}
+              >
+                <Text style={styles.categoryButtonText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        ) : inputMode === 'custom' ? (
+          <View style={styles.customMessageContainer}>
+            <TextInput
+              style={styles.customMessageInput}
               placeholder="Type your question here..."
-              className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={customMessage}
+              onChangeText={setCustomMessage}
+              multiline
             />
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg"
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleCustomMessageSubmit}
+              disabled={!customMessage.trim()}
             >
-              Send
-            </button>
-          </form>
+              <Text style={styles.sendButtonText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.askMoreButton}
+            onPress={() => setInputMode('custom')}
+          >
+            <Text style={styles.askMoreButtonText}>Ask another question</Text>
+          </TouchableOpacity>
         )}
-      </div>
-    </div>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
-export default ChatBot;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  header: {
+    backgroundColor: '#FF9500',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  resetButton: {
+    padding: 8,
+  },
+  resetButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  messagesContainer: {
+    flex: 1,
+  },
+  messagesList: {
+    padding: 16,
+  },
+  messageContainer: {
+    padding: 12,
+    borderRadius: 20,
+    marginBottom: 12,
+    maxWidth: '80%',
+  },
+  userMessageContainer: {
+    backgroundColor: '#FF9500',
+    alignSelf: 'flex-end',
+    borderBottomRightRadius: 0,
+  },
+  botMessageContainer: {
+    backgroundColor: 'white',
+    alignSelf: 'flex-start',
+    borderBottomLeftRadius: 0,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  },
+  inputContainer: {
+    padding: 12,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+  },
+  categoryButton: {
+    backgroundColor: '#FF9500',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  categoryButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  questionButton: {
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    borderRadius: 16,
+    marginTop: 8,
+  },
+  questionButtonText: {
+    color: '#333',
+  },
+  customMessageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  customMessageInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    maxHeight: 100,
+    backgroundColor: 'white',
+  },
+  sendButton: {
+    backgroundColor: '#FF9500',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginLeft: 8,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  askMoreButton: {
+    backgroundColor: '#FF9500',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  askMoreButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+});
+
+export default ChatbotApp;

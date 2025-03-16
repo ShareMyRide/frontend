@@ -1,19 +1,67 @@
 import React from "react";
-import { Button, Text, View } from "react-native";
+import { Pressable,Button, Text, View,StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import axios from "axios";
+import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const login = () => {
-  const onFormSubmit = (values) => {
-    console.log(values);
-    router.replace("/dashboard")
+  const router = useRouter();
+  
+  const onFormSubmit = async (values) => {
+    try {
+      console.log("Submitting login values:", values);
+      const response = await axios.post("http://192.168.230.205:2052/api/auth/login", {
+        email: values.email,
+        password: values.pswrd,
+      });
+      
+      console.log("Login successful:", response.data);
+      
+     
+      await AsyncStorage.setItem("token", response.data.token);
+      await AsyncStorage.setItem("userId", response.data.user.id);
+      
+     
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.user));
+      
+      alert("Login successful!");
+      
+     
+      const userData = JSON.stringify(response.data.user);
+      
+     
+      router.replace({
+        pathname: "/bottom-navi",
+        params: { user: userData }
+      });
+    } catch (error) {
+      if (error.response) {
+        console.error("Login failed:", error.response.data.message);
+        alert(error.response.data.message || "Login failed");
+      } else {
+        console.error("Error during login:", error.message);
+        alert("An error occurred. Please try again.");
+      }
+    }
   };
+
   return (
+     <LinearGradient
+              colors={['#f97316', 'white']}
+              style={styles.container}
+              start={{ x: 1.5, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
     <SafeAreaProvider>
       <SafeAreaView>
-        <View className="m-4 h-screen flex items-center justify-center">
-          <Text className="text-3xl font-bold text-center">Login</Text>
+        <View
+          className="p-4 h-screen flex items-center justify-center"
+        >
+          <Text className="text-4xl font-bold text-center">Login</Text>
           <Formik
             initialValues={{
               email: "",
@@ -22,9 +70,9 @@ const login = () => {
             onSubmit={onFormSubmit}
           >
             {({ handleChange, handleBlur, handleSubmit, values }) => (
-              <View className="mt-4 w-full border p-4 flex gap-4">
+              <View className="mt-4 w-full border p-5 flex gap-4">
                 <View>
-                  <Text className="mb-2">E-mail: </Text>
+                  <Text className="mb-2" style={styles.textLabel}>E-mail: </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("email")}
@@ -33,7 +81,7 @@ const login = () => {
                   />
                 </View>
                 <View>
-                  <Text className="mb-2">Password : </Text>
+                  <Text className="mb-2" style={styles.textLabel}>Password : </Text>
                   <TextInput
                     className="border"
                     onChangeText={handleChange("pswrd")}
@@ -41,9 +89,19 @@ const login = () => {
                     value={values.pswrd}
                   />
                 </View>
-                <Button onPress={handleSubmit} title="Submit" />
+                <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={styles.loginButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.buttonText}>Login</Text>
+                  </Pressable>
+                </View>
+                
                 <Link href="/register" asChild>
+
                   <Text>Haven't an account? Create Account</Text>
+
                 </Link>
               </View>
             )}
@@ -51,6 +109,31 @@ const login = () => {
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    marginVertical: 10
+  },
+  loginButton: {
+    backgroundColor: "#f97316", 
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+   // borderRadius: 15,
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5", 
+    padding: 20,
+  },
+})
+
 export default login;

@@ -15,7 +15,9 @@ const AddRide = () => {
   return (
   <SafeAreaProvider>
         <SafeAreaView>
-          <View className="m-4 h-screen flex items-center justify-center">
+
+          <View className="p-4  bg-gray-300 h-screen flex items-center justify-center">
+
             <Text className="text-3xl font-bold text-center">Add Ride</Text>
             <Formik
               initialValues={{
@@ -31,10 +33,10 @@ const AddRide = () => {
                 <View className="mt-4 w-full border p-4 flex gap-4">
                   <View>
                     <Pressable  onPress={()=>{router.push("/map")}} 
-                             className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                <Text className="text-white" >Choose Your Destination</Text>
+                             className=" mb-3 ml-14 mr-14 bg-green-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                <Text className="text-white text-center" >Click Here! Add Ride Locations</Text>
                               </Pressable>
-                    <Text className="mb-2">Vehicle Type: </Text>
+                    <Text className="mb-2 ">Vehicle Type: </Text>
                     <TextInput
                       className="border"
                       onChangeText={handleChange("v_type")}
@@ -78,7 +80,14 @@ const AddRide = () => {
                       value={values.begin_time}
                     />
                   </View>
-                  <Button onPress={handleSubmit} title="Submit" />
+                  <Pressable
+                                    onPress={() => {
+                                      router.push("/add-ride-preview");
+                                    }}
+                                    className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                  >
+                                    <Text className="text-white text-center">Add Ride</Text>
+                                  </Pressable>
                 
                 </View>
               )}
@@ -86,6 +95,7 @@ const AddRide = () => {
           </View>
         </SafeAreaView>
       </SafeAreaProvider>
+
   )
 }
 export default AddRide;

@@ -2,7 +2,9 @@ import CustomListView from "../components/ride-listview";
 import React, { useState } from "react";
 import { Button, Text, View } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-const ridepreview = () => {
+//import HeaderWithBackButton from "../components/HeaderWithBackButton"; // Import the header component
+
+const RidePreview = () => {
   const [data, setData] = useState([
     { id: 1, title: "Date", description: "1st Ride Details" },
     { id: 2, title: "Date", description: "2nd Ride Details" },
@@ -14,9 +16,10 @@ const ridepreview = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView>
-        <View className="m-4 h-screen flex items-center justify-center">
-          <Text className="text-3xl font-bold text-center">Your Rides</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#E0E0E0" }}>
+        {/* <HeaderWithBackButton title="Your Rides" /> */}
+         <Text className="font-bold text-3xl "> Preview Details</Text>
+        <View style={{ flex: 1, padding: 20, backgroundColor: "#E0E0E0" }}>
           <CustomListView
             data={data}
             onItemPress={handleItemPress}
@@ -26,6 +29,6 @@ const ridepreview = () => {
       </SafeAreaView>
     </SafeAreaProvider>
   );
-};
+}
 
-export default ridepreview;
+export default  RidePreview;

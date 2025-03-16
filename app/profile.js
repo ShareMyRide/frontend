@@ -1,30 +1,296 @@
-import React from "react";
-import { Pressable, Image, Text, View } from "react-native";
-import { Link, router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-const profile = () => {
-  return (
-    <SafeAreaProvider>
-      <SafeAreaView>
-        <View className="flex flex-col justify-between items-center ">
-          <Image
-            source={require("../assets/images/splash-icon.png")}
-            style={{ width: 100, height: 100 }}
-          />
-          <Text>Name: </Text>
-          <View className="flex items-center justify-center flex-row gap-10">
-            <Link href="/review" asChild>
-              <Text className="text-red-300">Reviews</Text>
+const Profile = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const params = useLocalSearchParams();
+  
+ 
+  const propUser = params.user;
+
+  const fetchProfile = async () => {
+    try {
+      
+      const token = await AsyncStorage.getItem("token");
+      let userId = await AsyncStorage.getItem("userId");
+      
+     
+      if (propUser) {
+        console.log("Using user data from props:", propUser);
+        
+        
+        const parsedUser = typeof propUser === 'string' ? JSON.parse(propUser) : propUser;
+        
+      
+        if (parsedUser.id || parsedUser._id) {
+          userId = parsedUser.id || parsedUser._id;
+        }
+      }
+      
+      
+      if (!userId || !token) {
+        const cachedUserData = await AsyncStorage.getItem("userData");
+        if (cachedUserData) {
+          const parsedCachedData = JSON.parse(cachedUserData);
+          userId = parsedCachedData.id || parsedCachedData._id;
+        }
+        
+        if (!userId) {
+          setError("User ID not found");
+          setLoading(false);
+          return;
+        }
+        
+        if (!token) {
+          setError("Not logged in!");
+          setLoading(false);
+          return;
+        }
+      }
+      
+      
+      console.log("Fetching detailed user data for ID:", userId);
+      const response = await axios.get(`http://192.168.230.205:2052/api/auth/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      console.log("Fetched detailed user data:", response.data);
+      
+      
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+      
+      setUserData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setError("Failed to load profile data");
+      setLoading(false);
+      
+      
+      try {
+        const cachedUserData = await AsyncStorage.getItem("userData");
+        if (cachedUserData) {
+          const parsedCachedData = JSON.parse(cachedUserData);
+          console.log("Using cached user data as fallback:", parsedCachedData);
+          setUserData(parsedCachedData);
+          setError(null);
+        }
+      } catch (cacheError) {
+        console.error("Error retrieving cached data:", cacheError);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, [propUser]);
+
+  if (loading) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#f97316" />
+            <Text style={styles.loadingText}>Loading profile...</Text>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Link href="/login" asChild>
+              <Text style={styles.loginLink}>Go to Login</Text>
             </Link>
           </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
 
-          <Text>phone Number: </Text>
-          <Text>Address: </Text>
-          <Text>Vehicle Details: </Text>
-        </View>
+  if (!userData) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>No user data available</Text>
+            <Link href="/login" asChild>
+              <Text style={styles.loginLink}>Go to Login</Text>
+            </Link>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  // Debug the user data structure
+  console.log("User data structure:", Object.keys(userData));
+
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.profileHeader}>
+            <Image
+              source={require("../assets/images/images.jpeg")}
+              style={styles.profileImage}
+            />
+            <Text style={styles.profileName}>
+              {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+            </Text>
+          </View>
+
+          <View style={styles.profileDetails}>
+            <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>Full Name:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>
+                  {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>Email:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
+              </View>
+            </View>
+            <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>NIC:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
+              </View>
+            </View>
+            <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>Address:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>
+                  {userData.address || "Address not provided"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>Vehicle Details:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>
+                  {userData.vehicleDetails || "Vehicle details not provided"}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.navigationLinks}>
+            <Link href="/review" asChild>
+              <Text style={styles.reviewLink}>View Reviews</Text>
+            </Link>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 };
-export default profile;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#E0E0E0",
+  },
+  container: {
+    flexGrow: 1,
+    alignItems: "center",
+    padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#333",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#d32f2f",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  loginLink: {
+    fontSize: 16,
+    color: "#f97316",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+  },
+  profileHeader: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 15,
+  },
+  profileName: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  profileDetails: {
+    width: "90%",
+  },
+  detailContainer: {
+    width: "100%",
+    marginBottom: 15,
+  },
+  detailLabel: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#555",
+    marginBottom: 5,
+  },
+  detailBox: {
+    width: "100%",
+    padding: 15,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+  },
+  detailValue: {
+    fontSize: 18,
+    color: "#333",
+  },
+  navigationLinks: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  reviewLink: {
+    fontSize: 20,
+    color: "#d32f2f",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+  },
+});
+
+export default Profile;

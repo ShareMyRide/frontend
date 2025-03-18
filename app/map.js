@@ -4,7 +4,7 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import axios from 'axios';
 
 // Your Google Maps API Key (Replace with real value)
-const GOOGLE_MAPS_API_KEY =  process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+const GOOGLE_MAPS_API_KEY = "AIzaSyAiQ_WJER_3HDCs0B6tH01WPTCzB1COSLA";
 
 export default function Mapp() {
   const [startLocation, setStartLocation] = useState(null);

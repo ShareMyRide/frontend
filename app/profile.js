@@ -56,7 +56,7 @@ const Profile = () => {
       
       
       console.log("Fetching detailed user data for ID:", userId);
-      const response = await axios.get(`http://192.168.230.205:2052/api/auth/users/${userId}`, {
+      const response = await axios.get(`http://192.168.230.200:2052/api/auth/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

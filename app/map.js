@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Button, Alert, TextInput, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import axios from 'axios';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 
-// Your Google Maps API Key (Replace with real value)
+// Google Maps API Key
 const GOOGLE_MAPS_API_KEY = "AIzaSyAiQ_WJER_3HDCs0B6tH01WPTCzB1COSLA";
 
 export default function map() {
@@ -15,6 +15,7 @@ export default function map() {
   const [endCoords, setEndCoords] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [distance, setDistance] = useState(null);
   const [mapRegion, setMapRegion] = useState({
     latitude: 7.8731,  // Default to Sri Lanka
     longitude: 80.7718,
@@ -60,21 +61,35 @@ export default function map() {
   // Geocode a location name to coordinates
   const geocodeLocation = async (locationName) => {
     try {
-      // First try with Nominatim (OpenStreetMap) which doesn't require API key
-      const searchQuery = `${locationName}, Sri Lanka`;
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1`;
+      // Try with Google Maps Geocoding API first (more accurate for routing)
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(locationName)}&region=lk&key=${GOOGLE_MAPS_API_KEY}`;
       
-      const response = await axios.get(url, {
+      const response = await axios.get(url);
+      
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const result = response.data.results[0];
+        return {
+          latitude: result.geometry.location.lat,
+          longitude: result.geometry.location.lng,
+          display_name: result.formatted_address
+        };
+      }
+      
+      // Fallback to Nominatim if Google fails
+      const searchQuery = `${locationName}, Sri Lanka`;
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1`;
+      
+      const nominatimResponse = await axios.get(nominatimUrl, {
         headers: {
           'User-Agent': 'RideShareApp/1.0'
         }
       });
       
-      if (response.data && response.data.length > 0) {
+      if (nominatimResponse.data && nominatimResponse.data.length > 0) {
         return {
-          latitude: parseFloat(response.data[0].lat),
-          longitude: parseFloat(response.data[0].lon),
-          display_name: response.data[0].display_name
+          latitude: parseFloat(nominatimResponse.data[0].lat),
+          longitude: parseFloat(nominatimResponse.data[0].lon),
+          display_name: nominatimResponse.data[0].display_name
         };
       } else {
         throw new Error(`No results found for: ${locationName}`);
@@ -140,7 +155,7 @@ export default function map() {
     }
   };
 
-  // Calculate route between start and end
+  // Calculate route between start and end using Google Directions API
   const calculateRoute = async () => {
     if (!startCoords || !endCoords) {
       Alert.alert('Error', 'Please set both start and end locations');
@@ -148,55 +163,156 @@ export default function map() {
     }
     
     try {
-      // Simple direct line for now (in a real app you'd use a routing API)
-      setRouteCoordinates([
-        { latitude: startCoords.latitude, longitude: startCoords.longitude },
-        { latitude: endCoords.latitude, longitude: endCoords.longitude }
-      ]);
+      // Use Google Directions API to get real-world route
+      const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords.latitude},${startCoords.longitude}&destination=${endCoords.latitude},${endCoords.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
       
-      // Adjust map to show the entire route
-      const midLat = (startCoords.latitude + endCoords.latitude) / 2;
-      const midLng = (startCoords.longitude + endCoords.longitude) / 2;
-      const latDelta = Math.abs(startCoords.latitude - endCoords.latitude) * 1.5;
-      const lngDelta = Math.abs(startCoords.longitude - endCoords.longitude) * 1.5;
+      const response = await axios.get(directionsUrl);
       
-      setMapRegion({
-        latitude: midLat,
-        longitude: midLng,
-        latitudeDelta: Math.max(0.05, latDelta),
-        longitudeDelta: Math.max(0.05, lngDelta),
-      });
+      if (response.data.status === 'OK' && response.data.routes.length > 0) {
+        // Extract the route and polyline points
+        const route = response.data.routes[0];
+        const leg = route.legs[0];
+        
+        // Get the distance
+        const distanceValue = leg.distance.text;
+        setDistance(distanceValue);
+        
+        // Decode the polyline to get route points
+        const points = decodePolyline(route.overview_polyline.points);
+        setRouteCoordinates(points);
+        
+        // Adjust map to show the entire route
+        const bounds = route.bounds;
+        const northEast = bounds.northeast;
+        const southWest = bounds.southwest;
+        
+        // Calculate center and deltas for map region
+        const midLat = (northEast.lat + southWest.lat) / 2;
+        const midLng = (northEast.lng + southWest.lng) / 2;
+        const latDelta = (northEast.lat - southWest.lat) * 1.2;
+        const lngDelta = (northEast.lng - southWest.lng) * 1.2;
+        
+        setMapRegion({
+          latitude: midLat,
+          longitude: midLng,
+          latitudeDelta: Math.max(0.05, latDelta),
+          longitudeDelta: Math.max(0.05, lngDelta),
+        });
+        
+      } else {
+        // Fallback to direct line if Google Directions fails
+        console.log('Falling back to direct line route');
+        setRouteCoordinates([
+          { latitude: startCoords.latitude, longitude: startCoords.longitude },
+          { latitude: endCoords.latitude, longitude: endCoords.longitude }
+        ]);
+        
+        // Calculate straight-line distance as fallback
+        const straightLineDistance = calculateHaversineDistance(
+          startCoords.latitude, startCoords.longitude,
+          endCoords.latitude, endCoords.longitude
+        );
+        setDistance(`${straightLineDistance.toFixed(1)} km (straight line)`);
+        
+        // Adjust map to show the entire route
+        const midLat = (startCoords.latitude + endCoords.latitude) / 2;
+        const midLng = (startCoords.longitude + endCoords.longitude) / 2;
+        const latDelta = Math.abs(startCoords.latitude - endCoords.latitude) * 1.5;
+        const lngDelta = Math.abs(startCoords.longitude - endCoords.longitude) * 1.5;
+        
+        setMapRegion({
+          latitude: midLat,
+          longitude: midLng,
+          latitudeDelta: Math.max(0.05, latDelta),
+          longitudeDelta: Math.max(0.05, lngDelta),
+        });
+      }
     } catch (error) {
       console.error('Error calculating route:', error);
       Alert.alert('Error', 'Failed to calculate route');
     }
   };
 
-  // Confirm selection and return to previous screen
-  const confirmSelection = () => {
-    if (!startCoords || !endCoords) {
-      Alert.alert('Error', 'Please set both start and end locations');
-      return;
-    }
-    
-    // Prepare data to return
-    const routeData = {
-      startingPoint: startCoords.display_name.split(',')[0],
-      endingPoint: endCoords.display_name.split(',')[0],
-      startCoordinates: [startCoords.latitude, startCoords.longitude],
-      endCoordinates: [endCoords.latitude, endCoords.longitude]
-    };
-    
-    // Return to the calling screen with data
-    if (returnRoute === 'add-ride') {
-      router.navigate({
-        pathname: '/add-ride',
-        params: { routeData: JSON.stringify(routeData) }
+  // Function to decode Google's polyline encoding
+  const decodePolyline = (encoded) => {
+    let index = 0;
+    const len = encoded.length;
+    let lat = 0, lng = 0;
+    const coordinates = [];
+
+    while (index < len) {
+      let b, shift = 0, result = 0;
+      
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      
+      const dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      
+      const dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      coordinates.push({
+        latitude: lat / 1e5,
+        longitude: lng / 1e5
       });
-    } else {
-      router.back();
     }
+
+    return coordinates;
   };
+
+  // Calculate haversine distance between two coordinates (straight line on a sphere)
+  const calculateHaversineDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    const distance = R * c; // Distance in km
+    return distance;
+  };
+
+ // In your map.js confirmSelection function:
+
+const confirmSelection = () => {
+  if (!startCoords || !endCoords) {
+    Alert.alert('Error', 'Please set both start and end locations');
+    return;
+  }
+  
+  // Prepare data to return
+  const routeData = {
+    startingPoint: startCoords.display_name.split(',')[0],
+    endingPoint: endCoords.display_name.split(',')[0],
+    startCoordinates: [startCoords.latitude, startCoords.longitude],
+    endCoordinates: [endCoords.latitude, endCoords.longitude],
+    distance: distance || 'Not calculated',
+    routePath: routeCoordinates
+  };
+  
+  console.log("Sending route data:", JSON.stringify(routeData));
+  
+  // Use router.push instead of replace to avoid issues
+  router.push({
+    pathname: '/add-ride',
+    params: { routeData: JSON.stringify(routeData) }
+  });
+}
 
   return (
     <View style={styles.container}>
@@ -267,6 +383,12 @@ export default function map() {
         )}
       </MapView>
       
+      {distance && (
+        <View style={styles.distanceContainer}>
+          <Text style={styles.distanceText}>Distance: {distance}</Text>
+        </View>
+      )}
+      
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
           style={[styles.button, styles.calculateButton]} 
@@ -309,6 +431,17 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 10,
     marginBottom: 10,
+  },
+  distanceContainer: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  distanceText: {
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',

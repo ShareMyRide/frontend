@@ -7,7 +7,7 @@ import { Link, router } from "expo-router";
 import axios from 'axios'; // Make sure axios is installed
 
 // Set your backend API URL here
-const API_URL = 'http://your-backend-url/api'; // Change to your actual backend URL
+const API_URL = 'http://172.16.193.119:2052/api'; // Change to your actual backend URL
 
 const AddRide = () => {
   const [loading, setLoading] = useState(false);

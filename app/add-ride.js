@@ -1,51 +1,109 @@
-import React, { useState } from 'react';
-import { Pressable, Button, Text, View, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Pressable, Text, View, Alert } from 'react-native';
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link, router } from "expo-router";
-import axios from 'axios'; // Make sure axios is installed
+import { useRouter, useLocalSearchParams } from "expo-router";
+import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Set your backend API URL here
-const API_URL = 'http://192.168.230.200:2052/api/ride'; // Change to your actual backend URL
+const API_URL = 'http://172.16.193.119:2052/api/ride/start'; // Change to your actual backend URL
 
 const AddRide = () => {
   const [loading, setLoading] = useState(false);
   const [routeData, setRouteData] = useState(null);
+  const router = useRouter();
+    
+  // Get params from the router
+  const params = useLocalSearchParams();
+  
+  // Extract route data from params if available
+  useEffect(() => {
+    if (params.routeData) {
+      try {
+        const parsedData = JSON.parse(params.routeData);
+        setRouteData(parsedData);
+        console.log("Route data received:", parsedData);
+      } catch (error) {
+        console.error("Error parsing route data:", error);
+      }
+    }
+  }, [params.routeData]);
+
+  // Define the missing navigateToMap function
+  const navigateToMap = () => {
+    router.push("/map");
+  };
 
   // This function will be called when the form is submitted
   const onFormSubmit = async (values) => {
     try {
       setLoading(true);
       
+      // Get the token from storage
+      const token = await AsyncStorage.getItem('token');
+      console.log("Retrieved token:", token); // Debug log
+      
+      // if (!token) {
+      //   Alert.alert("Error", "Please login first!");
+      //   router.replace("/login");
+      //   return;
+      // }
+      
       // Check if route data is available
       if (!routeData) {
-        Alert.alert("Error", "Please add ride locations first!");
+        console.error("No route data available when submitting form");
+        Alert.alert("Error", "Please add ride locations first! Click the 'Add Ride Locations' button to select your route.");
         setLoading(false);
         return;
       }
       
-      // Create ride data object combining form values and route data
+      // Additional validation to ensure all required fields exist
+      if (!routeData.startingPoint || !routeData.endingPoint || 
+          !routeData.startCoordinates || !routeData.endCoordinates) {
+        console.error("Incomplete route data:", routeData);
+        Alert.alert("Error", "Route data is incomplete. Please select locations again.");
+        setLoading(false);
+        return;
+      }
+      
+      // Your existing validation code...
+      
+      // Create ride data object
       const rideData = {
-        date: new Date().toISOString().split('T')[0], // Current date as default
+        date: new Date().toISOString().split('T')[0],
         startingPoint: routeData.startingPoint,
         endingPoint: routeData.endingPoint,
+        startCoordinates: routeData.startCoordinates,
+        endCoordinates: routeData.endCoordinates,
+        distance: routeData.distance,
+        routePath: routeData.routePath,
         vehicleType: values.v_type,
         vehicleNumber: values.v_number,
-        availableSeats: values.available_seats,
+        availableSeats: parseInt(values.available_seats),
         contactNumber: values.contact_num,
         beginningTime: values.begin_time
       };
       
       console.log("Submitting ride data:", rideData);
       
-      // Submit to backend API
-      const response = await axios.post(`${API_URL}/rides/start`, rideData);
+      // Make API call with authorization header
+      const response = await axios.post(
+        API_URL, 
+        rideData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
       
       console.log("Ride created successfully:", response.data);
       Alert.alert("Success", "Ride added successfully!");
       
-      // Navigate to preview page with the created ride data
+      // Navigate to preview with the created ride ID
       router.replace({
         pathname: "/add-ride-preview", 
         params: { rideId: response.data._id }
@@ -53,30 +111,22 @@ const AddRide = () => {
       
     } catch (error) {
       console.error("Error adding ride:", error);
-      Alert.alert(
-        "Error", 
-        error.response?.data || "Failed to add ride. Please try again."
-      );
+      if (error.response) {
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", error.response.data);
+      }
+      
+      let errorMessage = "Failed to add ride. Please try again.";
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      Alert.alert("Error", errorMessage);
     } finally {
       setLoading(false);
     }
-  };
-
-  // This function will be called when returning from the map screen
-  const handleMapReturn = (data) => {
-    // This should be called when the user returns from the map screen
-    setRouteData(data);
-  };
-
-  // Navigate to map screen
-  const navigateToMap = () => {
-    router.push({
-      pathname: "/map",
-      params: { 
-        returnRoute: "add-ride",
-        onReturn: handleMapReturn 
-      }
-    });
   };
 
   return (
@@ -90,6 +140,7 @@ const AddRide = () => {
               <Text className="font-bold">Selected Route:</Text>
               <Text>From: {routeData.startingPoint}</Text>
               <Text>To: {routeData.endingPoint}</Text>
+              {routeData.distance && <Text>Distance: {routeData.distance}</Text>}
             </View>
           )}
           
@@ -117,6 +168,7 @@ const AddRide = () => {
                     onChangeText={handleChange("v_type")}
                     onBlur={handleBlur("v_type")}
                     value={values.v_type}
+                    placeholder="e.g. Car, Van, Bus"
                   />
                 </View>
                 
@@ -127,6 +179,7 @@ const AddRide = () => {
                     onChangeText={handleChange("v_number")}
                     onBlur={handleBlur("v_number")}
                     value={values.v_number}
+                    placeholder="e.g. ABC-1234"
                   />
                 </View>
                 
@@ -138,6 +191,7 @@ const AddRide = () => {
                     onChangeText={handleChange("available_seats")}
                     onBlur={handleBlur("available_seats")}
                     value={values.available_seats}
+                    placeholder="e.g. 4"
                   />
                 </View>
                 
@@ -149,6 +203,7 @@ const AddRide = () => {
                     onChangeText={handleChange("contact_num")}
                     onBlur={handleBlur("contact_num")}
                     value={values.contact_num}
+                    placeholder="e.g. 077-1234567"
                   />
                 </View>
                 

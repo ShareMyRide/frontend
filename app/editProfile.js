@@ -190,8 +190,12 @@ const editProfile = () => {
             <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
-            
+                    
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
           </View>
+                    
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -273,7 +277,22 @@ const styles = StyleSheet.create({
       borderColor: "#ccc",
       padding: 5,
       borderRadius: 5,
-    }, 
+    }, saveButton: {
+      marginTop: 20,
+      backgroundColor: "#d32f2f",
+      padding: 10,
+      borderRadius: 5,
+    },
+    editButtonText: {
+      color: "white",
+      fontWeight: "bold",
+      fontSize: 16,
+    },
+    saveButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+    },
 });
 
 export default editProfile;

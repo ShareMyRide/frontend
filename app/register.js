@@ -1,180 +1,184 @@
-import React from "react";
-import { Pressable, Button, Text, View, StyleSheet } from "react-native";
+import React, { useState } from 'react';
+import { Pressable, Button, Text, View, Alert } from 'react-native';
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link, useRouter } from "expo-router";
-import axios from "axios";
-import { LinearGradient } from "expo-linear-gradient";
+import { Link, router } from "expo-router";
+import axios from 'axios'; // Make sure axios is installed
 
-const register = () => {
-  const router = useRouter(); 
+// Set your backend API URL here
+const API_URL = 'http://172.16.193.119:2052/api'; // Change to your actual backend URL
+
+const AddRide = () => {
+  const [loading, setLoading] = useState(false);
+  const [routeData, setRouteData] = useState(null);
+
+  // This function will be called when the form is submitted
   const onFormSubmit = async (values) => {
     try {
-      //const response = await axios.post("http://localhost:2052/api/auth/register", {  
-      const response = await axios.post("http://192.168.151.78:2052/api/auth/register", {  // Replace with ur IP
-        firstname: values.fname,
-        lastname: values.lname,
-        email: values.email,
-        NIC: values.nic,
-        password: values.pswrd,
-        confirmPassword: values.confPswrd,
-      });
-
-      console.log("Registration successful:", response.data);
-      alert("Registration successful");
-      router.replace("/bottom-navi"); 
-    } catch (error) {
-      if (error.response) {
-       
-        console.error("Registration failed:", error.response.data.message);
-        alert(error.response.data.message || "Registration failed");
-      } else {
-        
-        console.error("Error during registration:", error.message);
-        alert("An error occurred. Please try again.");
+      setLoading(true);
+      
+      // Check if route data is available
+      if (!routeData) {
+        Alert.alert("Error", "Please add ride locations first!");
+        setLoading(false);
+        return;
       }
+      
+      // Create ride data object combining form values and route data
+      const rideData = {
+        date: new Date().toISOString().split('T')[0], // Current date as default
+        startingPoint: routeData.startingPoint,
+        endingPoint: routeData.endingPoint,
+        vehicleType: values.v_type,
+        vehicleNumber: values.v_number,
+        availableSeats: values.available_seats,
+        contactNumber: values.contact_num,
+        beginningTime: values.begin_time
+      };
+      
+      console.log("Submitting ride data:", rideData);
+      
+      // Submit to backend API
+      const response = await axios.post(`${API_URL}/rides/start`, rideData);
+      
+      console.log("Ride created successfully:", response.data);
+      Alert.alert("Success", "Ride added successfully!");
+      
+      // Navigate to preview page with the created ride data
+      router.replace({
+        pathname: "/add-ride-preview", 
+        params: { rideId: response.data._id }
+      });
+      
+    } catch (error) {
+      console.error("Error adding ride:", error);
+      Alert.alert(
+        "Error", 
+        error.response?.data || "Failed to add ride. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
+  // This function will be called when returning from the map screen
+  const handleMapReturn = (data) => {
+    // This should be called when the user returns from the map screen
+    setRouteData(data);
+  };
+
+  // Navigate to map screen
+  const navigateToMap = () => {
+    router.push({
+      pathname: "/map",
+      params: { 
+        returnRoute: "add-ride",
+        onReturn: handleMapReturn 
+      }
+    });
+  };
+
   return (
-    <LinearGradient
-      colors={["#f97316", "white"]}
-      style={styles.container}
-      start={{ x: 1.5, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
-      <SafeAreaProvider>
-        <SafeAreaView>
-          <View className="p-4 h-screen flex items-center justify-center  ">
-            <Text className="text-4xl font-bold text-center">Register</Text>
-            <Formik
-              initialValues={{
-                fname: "",
-                lname: "",
-                email: "",
-                nic: "",
-                pswrd: "",
-                confPswrd: "",
-              }}
-              onSubmit={onFormSubmit}
-            >
-              {({ handleChange, handleBlur, handleSubmit, values }) => (
-                <View className="mt-4 w-full border p-4 flex gap-4">
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      First Name:{" "}
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("fname")}
-                      onBlur={handleBlur("fname")}
-                      value={values.fname}
-                    />
-                  </View>
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      Last Name:{" "}
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("lname")}
-                      onBlur={handleBlur("lname")}
-                      value={values.lname}
-                    />
-                  </View>
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      E-mail:{" "}
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                    />
-                  </View>
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      NIC number:{" "}
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("nic")}
-                      onBlur={handleBlur("nic")}
-                      value={values.nic}
-                    />
-                  </View>
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      Password :{" "}
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("pswrd")}
-                      onBlur={handleBlur("pswrd")}
-                      value={values.pswrd}
-                    />
-                  </View>
-                  <View>
-                    <Text className="mb-2" style={styles.textLabel}>
-                      {" "}
-                      Confirm Password :
-                    </Text>
-                    <TextInput
-                      className="border"
-                      onChangeText={handleChange("confPswrd")}
-                      onBlur={handleBlur("confPswrd")}
-                      value={values.confPswrd}
-                    />
-                  </View>
-
-                  <View style={styles.buttonContainer}>
-                  <Pressable
-                    style={styles.submitButton}
-                    onPress={handleSubmit}
-                  >
-                    <Text style={styles.buttonText}>SUBMIT</Text>
+    <SafeAreaProvider>
+      <SafeAreaView>
+        <View className="p-4 bg-gray-300 h-screen flex items-center justify-center">
+          <Text className="text-3xl font-bold text-center">Add Ride</Text>
+          
+          {routeData && (
+            <View className="w-full p-2 bg-green-100 rounded mt-2">
+              <Text className="font-bold">Selected Route:</Text>
+              <Text>From: {routeData.startingPoint}</Text>
+              <Text>To: {routeData.endingPoint}</Text>
+            </View>
+          )}
+          
+          <Formik
+            initialValues={{
+              v_type: "",
+              v_number: "",
+              available_seats: "",
+              contact_num: "",
+              begin_time: ""
+            }}
+            onSubmit={onFormSubmit}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values }) => (
+              <View className="mt-4 w-full border p-4 flex gap-4">
+                <View>
+                  <Pressable onPress={navigateToMap} 
+                    className="mb-3 ml-14 mr-14 bg-green-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <Text className="text-white text-center">Click Here! Add Ride Locations</Text>
                   </Pressable>
+                  
+                  <Text className="mb-2">Vehicle Type: </Text>
+                  <TextInput
+                    className="border p-2 rounded"
+                    onChangeText={handleChange("v_type")}
+                    onBlur={handleBlur("v_type")}
+                    value={values.v_type}
+                  />
                 </View>
-
-                  <Link href="/login" asChild>
-                    <Pressable>
-                      <Text>Already have an account?</Text>
-                    </Pressable>
-                  </Link>
+                
+                <View>
+                  <Text className="mb-2">Vehicle Number: </Text>
+                  <TextInput
+                    className="border p-2 rounded"
+                    onChangeText={handleChange("v_number")}
+                    onBlur={handleBlur("v_number")}
+                    value={values.v_number}
+                  />
                 </View>
-              )}
-            </Formik>
-          </View>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </LinearGradient>
+                
+                <View>
+                  <Text className="mb-2">Available Seats: </Text>
+                  <TextInput
+                    className="border p-2 rounded"
+                    keyboardType="numeric"
+                    onChangeText={handleChange("available_seats")}
+                    onBlur={handleBlur("available_seats")}
+                    value={values.available_seats}
+                  />
+                </View>
+                
+                <View>
+                  <Text className="mb-2">Contact Number: </Text>
+                  <TextInput
+                    className="border p-2 rounded"
+                    keyboardType="phone-pad"
+                    onChangeText={handleChange("contact_num")}
+                    onBlur={handleBlur("contact_num")}
+                    value={values.contact_num}
+                  />
+                </View>
+                
+                <View>
+                  <Text className="mb-2">Beginning Time: </Text>
+                  <TextInput
+                    className="border p-2 rounded"
+                    onChangeText={handleChange("begin_time")}
+                    onBlur={handleBlur("begin_time")}
+                    value={values.begin_time}
+                    placeholder="HH:MM AM/PM"
+                  />
+                </View>
+                
+                <Pressable
+                  onPress={handleSubmit}
+                  disabled={loading}
+                  className={`${loading ? 'bg-gray-400' : 'bg-orange-600'} mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                >
+                  <Text className="text-white text-center">
+                    {loading ? "Adding Ride..." : "Add Ride"}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+          </Formik>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  textLabel: {
-    fontWeight: "bold",
-  },
-  buttonContainer: {
-    marginVertical: 10
-  },
-  submitButton: {
-    backgroundColor: "#f97316", 
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-   // borderRadius: 15,
-    alignItems: "center"
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-});
-
-export default register;
+export default AddRide;

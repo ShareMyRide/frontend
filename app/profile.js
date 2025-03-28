@@ -11,29 +11,29 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const params = useLocalSearchParams();
   
-  // Extract user from params if available
+ 
   const propUser = params.user;
 
   const fetchProfile = async () => {
     try {
-      // Get token and userId from AsyncStorage
+      
       const token = await AsyncStorage.getItem("token");
       let userId = await AsyncStorage.getItem("userId");
       
-      // First check if we have user data from props
+     
       if (propUser) {
         console.log("Using user data from props:", propUser);
         
-        // If propUser is a string, parse it
+        
         const parsedUser = typeof propUser === 'string' ? JSON.parse(propUser) : propUser;
         
-        // Update userId if available from props
+      
         if (parsedUser.id || parsedUser._id) {
           userId = parsedUser.id || parsedUser._id;
         }
       }
       
-      // Ensure we have a userId and token
+      
       if (!userId || !token) {
         const cachedUserData = await AsyncStorage.getItem("userData");
         if (cachedUserData) {
@@ -54,9 +54,9 @@ const Profile = () => {
         }
       }
       
-      // Always fetch detailed user data from API
+      
       console.log("Fetching detailed user data for ID:", userId);
-      const response = await axios.get(`http://192.168.151.78:2052/api/auth/users/${userId}`, {
+      const response = await axios.get(`http://172.16.193.119:2052/api/auth/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -64,7 +64,7 @@ const Profile = () => {
       
       console.log("Fetched detailed user data:", response.data);
       
-      // Update the cached user data with the detailed data
+      
       await AsyncStorage.setItem("userData", JSON.stringify(response.data));
       
       setUserData(response.data);
@@ -74,7 +74,7 @@ const Profile = () => {
       setError("Failed to load profile data");
       setLoading(false);
       
-      // Try to use cached data as fallback
+      
       try {
         const cachedUserData = await AsyncStorage.getItem("userData");
         if (cachedUserData) {

@@ -52,6 +52,10 @@ const Dashboard = ({ user }) => {
     }
   };
 
+  const navigateToChatbot = () => {
+    router.push("/chatbot");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -61,6 +65,7 @@ const Dashboard = ({ user }) => {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Dashboard</Text>
         </View>
+       
       </View>
 
       {/* Display user information if available */}
@@ -95,6 +100,15 @@ const Dashboard = ({ user }) => {
         </Pressable>
       </View>
 
+      {/* Floating chatbot button for easy access */}
+      <Pressable 
+        onPress={navigateToChatbot} 
+        style={styles.floatingChatButton}
+      >
+        <Ionicons name="chatbubble" size={24} color="#FFFFFF" />
+        <Text style={styles.chatButtonText}>Support</Text>
+      </Pressable>
+
       <Modal
         visible={isMenuVisible}
         animationType="slide"
@@ -121,6 +135,17 @@ const Dashboard = ({ user }) => {
             >
               <View style={styles.menuItem}>
                 <Text style={styles.menuItemText}>Your Rides</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                router.push("/chatbot");
+                toggleMenu();
+              }}
+            >
+              <View style={styles.menuItem}>
+                <Ionicons name="chatbubble-ellipses" size={18} color="#f97316" style={{marginRight: 10}} />
+                <Text style={styles.menuItemText}>Support Chat</Text>
               </View>
             </Pressable>
             <Pressable
@@ -153,6 +178,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   menuButton: {
+    padding: 10,
+  },
+  chatbotButton: {
     padding: 10,
   },
   titleContainer: {
@@ -210,6 +238,27 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  floatingChatButton: {
+    position: "absolute",
+    right: 20,
+    bottom: 30,
+    backgroundColor: "#f97316",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  chatButtonText: {
+    color: "white",
+    fontWeight: "600",
+    marginLeft: 8,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "flex-start",
@@ -224,6 +273,8 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
   },
   menuItemText: {
     fontSize: 16,

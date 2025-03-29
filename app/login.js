@@ -13,6 +13,7 @@ const login = () => {
     // try {
       console.log("Submitting login values:", values);
 
+<<<<<<< Updated upstream
 
       // const response = await fetch("http://localhost:2052/api/auth/login", {
       //   method: "POST",
@@ -42,6 +43,42 @@ const login = () => {
     //   console.error("Error during login:", error);
     //   alert("An error occurred. Please try again.");
     // }
+=======
+      const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
+
+        email: values.email,
+        password: values.pswrd,
+      });
+      
+      console.log("Login successful:", response.data);
+      
+     
+      await AsyncStorage.setItem("token", response.data.token);
+      await AsyncStorage.setItem("userId", response.data.user.id);
+      
+     
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.user));
+      
+      alert("Login successful!");
+      
+     
+      const userData = JSON.stringify(response.data.user);
+      
+     
+      router.replace({
+        pathname: "/bottom-navi",
+        params: { user: userData }
+      });
+    } catch (error) {
+      if (error.response) {
+        console.error("Login failed:", error.response.data.message);
+        alert(error.response.data.message || "Login failed");
+      } else {
+        console.error("Error during login:", error.message);
+        alert("An error occurred. Please try again.");
+      }
+    }
+>>>>>>> Stashed changes
   };
 
   return (
@@ -94,6 +131,9 @@ const login = () => {
                                 </Pressable>
                 <Link href="/register" asChild>
                   <Text className="underline"  style={styles.textLabel}>Haven't an account? Create Account</Text>
+                </Link>
+                <Link href="/forgetpassword" asChild>
+                  <Text>Forget password</Text>
                 </Link>
               </View>
             )}

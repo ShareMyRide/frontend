@@ -4,6 +4,143 @@ import { Link } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
 const Profile = () => {
+<<<<<<< Updated upstream
+=======
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const params = useLocalSearchParams();
+  
+ 
+  const propUser = params.user;
+
+  const fetchProfile = async () => {
+    try {
+      
+      const token = await AsyncStorage.getItem("token");
+      let userId = await AsyncStorage.getItem("userId");
+      
+     
+      if (propUser) {
+        console.log("Using user data from props:", propUser);
+        
+        
+        const parsedUser = typeof propUser === 'string' ? JSON.parse(propUser) : propUser;
+        
+      
+        if (parsedUser.id || parsedUser._id) {
+          userId = parsedUser.id || parsedUser._id;
+        }
+      }
+      
+      
+      if (!userId || !token) {
+        const cachedUserData = await AsyncStorage.getItem("userData");
+        if (cachedUserData) {
+          const parsedCachedData = JSON.parse(cachedUserData);
+          userId = parsedCachedData.id || parsedCachedData._id;
+        }
+        
+        if (!userId) {
+          setError("User ID not found");
+          setLoading(false);
+          return;
+        }
+        
+        if (!token) {
+          setError("Not logged in!");
+          setLoading(false);
+          return;
+        }
+      }
+      
+      
+      console.log("Fetching detailed user data for ID:", userId);
+
+      const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      console.log("Fetched detailed user data:", response.data);
+      
+      
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+      
+      setUserData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setError("Failed to load profile data");
+      setLoading(false);
+      
+      
+      try {
+        const cachedUserData = await AsyncStorage.getItem("userData");
+        if (cachedUserData) {
+          const parsedCachedData = JSON.parse(cachedUserData);
+          console.log("Using cached user data as fallback:", parsedCachedData);
+          setUserData(parsedCachedData);
+          setError(null);
+        }
+      } catch (cacheError) {
+        console.error("Error retrieving cached data:", cacheError);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, [propUser]);
+
+  if (loading) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#f97316" />
+            <Text style={styles.loadingText}>Loading profile...</Text>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Link href="/login" asChild>
+              <Text style={styles.loginLink}>Go to Login</Text>
+            </Link>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>No user data available</Text>
+            <Link href="/login" asChild>
+              <Text style={styles.loginLink}>Go to Login</Text>
+            </Link>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  // Debug the user data structure
+  console.log("User data structure:", Object.keys(userData));
+
+>>>>>>> Stashed changes
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>

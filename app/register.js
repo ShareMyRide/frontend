@@ -16,6 +16,16 @@ const AddRide = () => {
   // This function will be called when the form is submitted
   const onFormSubmit = async (values) => {
     try {
+
+      //const response = await axios.post("http://localhost:2052/api/auth/register", {  
+      const response = await axios.post("http:///192.168.193.81:2052/api/auth/register", {  // Replace with ur IP
+        firstname: values.fname,
+        lastname: values.lname,
+        email: values.email,
+        NIC: values.nic,
+        password: values.pswrd,
+        confirmPassword: values.confPswrd,
+
       setLoading(true);
       
       // Check if route data is available
@@ -49,6 +59,7 @@ const AddRide = () => {
       router.replace({
         pathname: "/add-ride-preview", 
         params: { rideId: response.data._id }
+
       });
       
     } catch (error) {

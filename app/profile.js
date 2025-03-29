@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
@@ -145,13 +144,11 @@ const Profile = () => {
   // Debug the user data structure
   console.log("User data structure:", Object.keys(userData));
 
-
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.profileHeader}>
-
             <Image
               source={require("../assets/images/images.jpeg")}
               style={styles.profileImage}
@@ -346,3 +343,4 @@ const styles = StyleSheet.create({
 });
 
 export default profile;
+

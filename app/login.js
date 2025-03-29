@@ -6,32 +6,74 @@ import { Formik } from "formik";
 import { Link, useRouter } from "expo-router";
 import axios from "axios";
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const login = () => {
   const router = useRouter();
-
+  
   const onFormSubmit = async (values) => {
     try {
-
       console.log("Submitting login values:", values);
-      //const response = await axios.post("http://localhost:2052/api/auth/login", {
-      const response = await axios.post("http://192.168.222.127:2052/api/auth/login", {
 
-        
+      // const response = await fetch("http://localhost:2052/api/auth/login", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     email: values.email,
+      //     password: values.pswrd,
+      //   }),
+      // });
+
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   console.error("Login failed:", errorData.message);
+      //   alert(errorData.message || "Login failed");
+      //   return;
+      // }
+
+
+      // const data = await response.json();
+      // console.log("Login successful:", data);
+      // alert("Login successful!");
+      router.replace("/dashboard");
+
+    // } catch (error) {
+    //   console.error("Error during login:", error);
+    //   alert("An error occurred. Please try again.");
+    // }
+      const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
+
+
         email: values.email,
         password: values.pswrd,
       });
-
+      
       console.log("Login successful:", response.data);
+      
+     
+      await AsyncStorage.setItem("token", response.data.token);
+      await AsyncStorage.setItem("userId", response.data.user.id);
+      
+     
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.user));
+      
       alert("Login successful!");
-      router.replace("/dashboard"); 
+      
+     
+      const userData = JSON.stringify(response.data.user);
+      
+     
+      router.replace({
+        pathname: "/bottom-navi",
+        params: { user: userData }
+      });
     } catch (error) {
       if (error.response) {
-        
         console.error("Login failed:", error.response.data.message);
         alert(error.response.data.message || "Login failed");
       } else {
-       
         console.error("Error during login:", error.message);
         alert("An error occurred. Please try again.");
       }
@@ -80,13 +122,24 @@ const login = () => {
                   />
                 </View>
                 <View style={styles.buttonContainer}>
-                <Button onPress={handleSubmit} title="Submit"  />
+                  <Pressable
+                    style={styles.loginButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.buttonText}>Login</Text>
+                  </Pressable>
                 </View>
                 
                 <Link href="/register" asChild>
 
                   <Text>Haven't an account? Create Account</Text>
 
+                </Link>
+                <Link href="/forgetpassword" asChild>
+                  <Text>Forget password</Text>
+                </Link>
+                <Link href="/forgetpassword" asChild>
+                  <Text>Forget password</Text>
                 </Link>
               </View>
             )}
@@ -99,9 +152,20 @@ const login = () => {
 };
 
 const styles = StyleSheet.create({
-
-  buttonContainer:{
-    backgroundColor: "black"
+  buttonContainer: {
+    marginVertical: 10
+  },
+  loginButton: {
+    backgroundColor: "#f97316", 
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+   // borderRadius: 15,
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
   },
   container: {
     flex: 1,

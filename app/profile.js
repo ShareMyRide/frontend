@@ -1,11 +1,11 @@
-import React from "react";
-import { Image, Text, View, StyleSheet, ScrollView } from "react-native";
-import { Link } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const Profile = () => {
-<<<<<<< Updated upstream
-=======
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,6 +58,7 @@ const Profile = () => {
       console.log("Fetching detailed user data for ID:", userId);
 
       const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -140,7 +141,6 @@ const Profile = () => {
   // Debug the user data structure
   console.log("User data structure:", Object.keys(userData));
 
->>>>>>> Stashed changes
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -150,33 +150,37 @@ const Profile = () => {
               source={require("../assets/images/images.jpeg")}
               style={styles.profileImage}
             />
-            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileName}>
+              {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+            </Text>
           </View>
 
           <View style={styles.profileDetails}>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>John Michael Doe</Text>
+                <Text style={styles.detailValue}>
+                  {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+                </Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>john.doe@example.com</Text>
+                <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
-              <Text style={styles.detailLabel}>Phone Number:</Text>
+              <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>+1 (555) 123-4567</Text>
+                <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Address:</Text>
               <View style={styles.detailBox}>
                 <Text style={styles.detailValue}>
-                  123 Main St, Anytown, CA 91234, USA
+                  {userData.address || "Address not provided"}
                 </Text>
               </View>
             </View>
@@ -184,7 +188,7 @@ const Profile = () => {
               <Text style={styles.detailLabel}>Vehicle Details:</Text>
               <View style={styles.detailBox}>
                 <Text style={styles.detailValue}>
-                  2022 Honda Civic, License Plate: ABC-1234
+                  {userData.vehicleDetails || "Vehicle details not provided"}
                 </Text>
               </View>
             </View>
@@ -210,6 +214,34 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#333",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#d32f2f",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  loginLink: {
+    fontSize: 16,
+    color: "#f97316",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
   profileHeader: {
     alignItems: "center",

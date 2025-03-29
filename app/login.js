@@ -1,19 +1,19 @@
 import React from "react";
-import { Pressable,Button, Text, View, StyleSheet} from "react-native";
+import { Pressable,Button, Text, View,StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import axios from "axios";
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const login = () => {
-
-
+  const router = useRouter();
+  
   const onFormSubmit = async (values) => {
-    // try {
+    try {
       console.log("Submitting login values:", values);
-
-<<<<<<< Updated upstream
 
       // const response = await fetch("http://localhost:2052/api/auth/login", {
       //   method: "POST",
@@ -43,8 +43,8 @@ const login = () => {
     //   console.error("Error during login:", error);
     //   alert("An error occurred. Please try again.");
     // }
-=======
       const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
+
 
         email: values.email,
         password: values.pswrd,
@@ -78,7 +78,7 @@ const login = () => {
         alert("An error occurred. Please try again.");
       }
     }
->>>>>>> Stashed changes
+
   };
 
   return (
@@ -121,16 +121,22 @@ const login = () => {
                     value={values.pswrd}
                   />
                 </View>
-                <Pressable
-                                  onPress={() => {
-                                    router.push("/dashboard");
-                                  }}
-                                  className="bg-orange-600 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                >
-                                  <Text className="text-white text-center">SUBMIT</Text>
-                                </Pressable>
+                <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={styles.loginButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.buttonText}>Login</Text>
+                  </Pressable>
+                </View>
+                
                 <Link href="/register" asChild>
-                  <Text className="underline"  style={styles.textLabel}>Haven't an account? Create Account</Text>
+
+                  <Text>Haven't an account? Create Account</Text>
+
+                </Link>
+                <Link href="/forgetpassword" asChild>
+                  <Text>Forget password</Text>
                 </Link>
                 <Link href="/forgetpassword" asChild>
                   <Text>Forget password</Text>
@@ -146,11 +152,26 @@ const login = () => {
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    marginVertical: 10
+  },
+  loginButton: {
+    backgroundColor: "#f97316", 
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+   // borderRadius: 15,
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+  },
   container: {
     flex: 1,
+    backgroundColor: "#F5F5F5", 
+    padding: 20,
   },
-  textLabel: {
-    fontWeight: "bold",
-  }
-});
+})
+
 export default login;

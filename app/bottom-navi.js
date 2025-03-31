@@ -6,6 +6,7 @@ import Home from "./dashboard";
 import Activities from "./add-ride-preview";
 import Review from "./review";
 import Profile from "./profile";
+import UserRidesPreview from "./add-ride-preview";
 
 const BottomNavi = () => {
   // Use useLocalSearchParams to get the params passed through navigation
@@ -47,6 +48,8 @@ const BottomNavi = () => {
  
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
+      case 'activities':
+        return <UserRidesPreview user={user} jumpTo={jumpTo} />;
       case 'home':
         return <Home user={user} jumpTo={jumpTo} />;
       case 'activities':

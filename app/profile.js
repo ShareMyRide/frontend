@@ -60,7 +60,9 @@ const profile = () => {
       // Fetch user data from API
       console.log("Fetching detailed user data for ID:", userId);
 
+
       const response = await axios.get(`http://${BACKEND_URL}:2052/api/auth/users/${userId}`, {
+
 
         headers: {
           Authorization: `Bearer ${token}`,

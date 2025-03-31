@@ -172,6 +172,8 @@ export default function map() {
         // Extract the route and polyline points
         const route = response.data.routes[0];
         const leg = route.legs[0];
+
+        console.log(route);
         
         // Get the distance
         const distanceValue = leg.distance.text;
@@ -305,7 +307,7 @@ const confirmSelection = () => {
     routePath: routeCoordinates
   };
   
-  console.log("Sending route data:", JSON.stringify(routeData));
+  console.log("Sending route data:", JSON.stringify(routeData.routePath));
   
   // Use router.push instead of replace to avoid issues
   router.push({

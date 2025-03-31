@@ -5,7 +5,7 @@ import { router,useNavigation  } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 // Set your backend API URL here
 
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
@@ -55,21 +55,9 @@ export default function UserRidesPreview({ jumpTo, user }) {
     }
   };
   
-  const handleGoToDashboard = () => {
-    if (jumpTo) {
-      jumpTo('home'); // Use jumpTo if available (from bottom navigation)
-    } else {
-      router.push('/dashboard'); // Use router as fallback
-    }
-  };
+  const handleGoBack = () => {
+    router.push('/dashboard');
 
-  const handleAddRide = () => {
-    if (jumpTo) {
-      // If we have jumpTo, we're in the tab navigator context
-      router.push('/add-ride');
-    } else {
-      router.push('/add-ride');
-    }
   };
   
   const handleEditRide = (ride) => {

@@ -7,7 +7,7 @@ import { Link, useRouter } from "expo-router";
 import axios from 'axios';
 import { LinearGradient } from "expo-linear-gradient";
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 const register = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();

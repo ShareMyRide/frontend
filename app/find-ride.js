@@ -8,7 +8,9 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 
 const BACKEND_URL = process.env.BACKEND_URL
 // Set your backend API URL here
+
 const API_URL = `http://${BACKEND_URL}:2052`; // Change to your actual backend URL
+
 
 const FindRide = () => {
   const [startLocation, setStartLocation] = useState('');

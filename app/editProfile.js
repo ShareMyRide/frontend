@@ -354,11 +354,13 @@ const EditProfile = () => {
             <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Save</Text>
-              <Link href="/review" asChild>
+            </TouchableOpacity>
+            
+          </View>
+          <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
-            </TouchableOpacity>
-          </View></View>
+          </View>
                     
         </ScrollView>
       </SafeAreaView>

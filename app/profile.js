@@ -5,7 +5,9 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-const Profile = () => {
+const BACKEND_URL = process.env.BACKEND_URL
+
+const profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,7 +60,9 @@ const Profile = () => {
       // Fetch user data from API
       console.log("Fetching detailed user data for ID:", userId);
 
-      const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+
+      const response = await axios.get(`http://${BACKEND_URL}:2052/api/auth/users/${userId}`, {
+
 
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,6 +75,47 @@ const Profile = () => {
       await AsyncStorage.setItem("userData", JSON.stringify(response.data));
       
       setUserData(response.data);
+      if (response.data && (response.data.id || response.data._id)) {
+        // Fetch the most recent ride for this user
+        const userId = response.data.id || response.data._id;
+        
+        try {
+          const rideResponse = await axios.get(
+            `http://${BACKEND_URL}:2052/api/ride/latestByUser/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          console.log("Fetched ride data:", rideResponse.data);
+          setRideData(rideResponse.data);
+          
+          // Update the user data with vehicle details if not already present
+          if (rideResponse.data && !response.data.vehicleDetails) {
+            const updatedUserData = {
+              ...response.data,
+              vehicleType: rideResponse.data.vehicleType,
+              vehicleNumber: rideResponse.data.vehicleNumber,
+              vehicleDetails: `${rideResponse.data.vehicleType || 'Unknown'} (${rideResponse.data.vehicleNumber || 'No plate number'})`
+            };
+            
+            setUserData(updatedUserData);
+            await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
+          } else {
+            setUserData(response.data);
+            await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+          }
+        } catch (rideError) {
+          console.error("Error fetching ride data:", rideError);
+          // Still use the user data even if ride fetch fails
+          setUserData(response.data);
+          await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+        }
+      }
+      
+      setLoading(false);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching profile:", error);

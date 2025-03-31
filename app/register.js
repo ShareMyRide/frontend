@@ -7,6 +7,7 @@ import { Link, useRouter } from "expo-router";
 import axios from 'axios';
 import { LinearGradient } from "expo-linear-gradient";
 
+const BACKEND_URL = process.env.BACKEND_URL
 const register = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -15,7 +16,11 @@ const register = () => {
     try {
       setLoading(true);
       //const response = await axios.post("http://localhost:2052/api/auth/register", {  
-      const response = await axios.post("http://192.168.216.78:2052/api/auth/register", {  // Replace with your IP
+
+
+      const response = await axios.post(`http://${BACKEND_URL}:2052/api/auth/register`, {  // Replace with ur IP
+
+
         firstname: values.fname,
         lastname: values.lname,
         email: values.email,

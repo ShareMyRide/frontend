@@ -51,6 +51,9 @@ const Dashboard = ({ user }) => {
       toggleMenu();
     }
   };
+  const navigateToEditProfile = () => {
+    router.push("/editProfile");
+  };
 
   const navigateToChatbot = () => {
     router.push("/chatbot");
@@ -125,7 +128,7 @@ const Dashboard = ({ user }) => {
                 <Text style={styles.menuItemText}>View Profile</Text>
               </View>
             </Pressable>
-            <Pressable onPress={navigateToProfile}>
+            <Pressable onPress={navigateToEditProfile}>
               <View style={styles.menuItem}>
                 <Text style={styles.menuItemText}>Edit Profile</Text>
               </View>
@@ -140,7 +143,7 @@ const Dashboard = ({ user }) => {
                 <Text style={styles.menuItemText}>Your Rides</Text>
               </View>
             </Pressable>
-            <Pressable
+            {/* <Pressable
               onPress={() => {
                 router.push("/chatbot");
                 toggleMenu();
@@ -150,7 +153,7 @@ const Dashboard = ({ user }) => {
                 <Ionicons name="chatbubble-ellipses" size={18} color="#f97316" style={{marginRight: 10}} />
                 <Text style={styles.menuItemText}>Support Chat</Text>
               </View>
-            </Pressable>
+            </Pressable> */}
             <Pressable
               onPress={() => {
                 router.push("/login");

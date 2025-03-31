@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.230.205:2052/api/chatbot'; 
+
+const API_URL = 'http://192.168.216.200:2052/api/chatbot'; 
+
 
 const ChatbotApp = () => {
   const [categories, setCategories] = useState([]);

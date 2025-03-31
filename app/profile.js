@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator,Pressable } from "react-native";
+import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { router } from "expo-router";
 
-
-
-
-const profile = () => {
+const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [rideData, setRideData] = useState(null);
   const params = useLocalSearchParams();
   
  
@@ -63,7 +58,6 @@ const profile = () => {
       console.log("Fetching detailed user data for ID:", userId);
 
       const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
-
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -75,47 +69,6 @@ const profile = () => {
       await AsyncStorage.setItem("userData", JSON.stringify(response.data));
       
       setUserData(response.data);
-      if (response.data && (response.data.id || response.data._id)) {
-        // Fetch the most recent ride for this user
-        const userId = response.data.id || response.data._id;
-        
-        try {
-          const rideResponse = await axios.get(
-            `http://192.168.216.78:2052/api/ride/latestByUser/${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          
-          console.log("Fetched ride data:", rideResponse.data);
-          setRideData(rideResponse.data);
-          
-          // Update the user data with vehicle details if not already present
-          if (rideResponse.data && !response.data.vehicleDetails) {
-            const updatedUserData = {
-              ...response.data,
-              vehicleType: rideResponse.data.vehicleType,
-              vehicleNumber: rideResponse.data.vehicleNumber,
-              vehicleDetails: `${rideResponse.data.vehicleType || 'Unknown'} (${rideResponse.data.vehicleNumber || 'No plate number'})`
-            };
-            
-            setUserData(updatedUserData);
-            await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
-          } else {
-            setUserData(response.data);
-            await AsyncStorage.setItem("userData", JSON.stringify(response.data));
-          }
-        } catch (rideError) {
-          console.error("Error fetching ride data:", rideError);
-          // Still use the user data even if ride fetch fails
-          setUserData(response.data);
-          await AsyncStorage.setItem("userData", JSON.stringify(response.data));
-        }
-      }
-      
-      setLoading(false);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -199,89 +152,51 @@ const profile = () => {
             <Text style={styles.profileName}>
               {userData.firstname || userData.username || "User"} {userData.lastname || ""}
             </Text>
-
           </View>
 
           <View style={styles.profileDetails}>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
-
                 <Text style={styles.detailValue}>
                   {userData.firstname || userData.username || "User"} {userData.lastname || ""}
                 </Text>
-
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
-
                 <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
-
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
-
                 <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
-
-              </View>
-            </View>
-            <View style={styles.detailContainer}>
-              <Text style={styles.detailLabel}>Contact Number:</Text>
-              <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>{userData.mobileNumber || "Not provided"}</Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Address:</Text>
               <View style={styles.detailBox}>
-
                 <Text style={styles.detailValue}>
                   {userData.address || "Address not provided"}
                 </Text>
-
               </View>
             </View>
             <View style={styles.detailContainer}>
-
-            <Text style={styles.detailLabel}>Vehicle Details:</Text>
-            <View style={styles.detailBox}>
-            <Text style={styles.detailValue}>
-              {userData.vehicleDetails || 
-              (userData.vehicleType && userData.vehicleNumber 
-                ? `${userData.vehicleType} (${userData.vehicleNumber})` 
-                : (rideData && rideData.vehicleType 
-                    ? `${rideData.vehicleType} (${rideData.vehicleNumber || 'No plate number'})` 
-                    : "Vehicle details not provided"))}
-
+              <Text style={styles.detailLabel}>Vehicle Details:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>
+                  {userData.vehicleDetails || "Vehicle details not provided"}
                 </Text>
-
               </View>
             </View>
-          </View>
-           <View style={styles.buttonContainer}>
-                        <Pressable
-                          onPress={() => {
-                            router.push("/editProfile");
-                          }}
-                          style={styles.editButton}
-                        >
-                          <Text style={styles.buttonText}>Edit Profile</Text>
-                        </Pressable>
           </View>
 
           <View style={styles.navigationLinks}>
             <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
-            <TouchableOpacity style={styles.editButton} onPress={handleEditToggle}>
-              <Text style={styles.editButtonText}>
-                {profile.isEditing ? "Save" : "Edit Profile"}
-              </Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -377,36 +292,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecorationLine: "underline",
   },
-
-  editableInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    fontSize: 18,
-    color: "#333",
-  },
-  editableName: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#333",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 5,
-    borderRadius: 5,
-  },
-  editButton: {
-    marginTop: 20,
-    backgroundColor: "#d32f2f",
-    padding: 10,
-    borderRadius: 5,
-  },
-  editButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
 });
 
-export default profile;
-
+export default Profile;

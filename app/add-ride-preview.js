@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 // Set your backend API URL here
+
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
 
 export default function UserRidesPreview() {
@@ -57,20 +58,46 @@ export default function UserRidesPreview() {
     router.push('/dashboard');
   };
   
-  const handleEditRide = (rideId) => {
+  const handleEditRide = (ride) => {
     router.push({
       pathname: '/add-ride',
-      params: { editRideId: rideId }
+      params: {
+        editRideId: ride._id,
+        startingPoint: ride.startingPoint,
+        endingPoint: ride.endingPoint,
+        date: ride.date,
+        beginningTime: ride.beginningTime,
+        seatsAvailable: ride.seatsAvailable,
+        price: ride.price,
+        vehicleDetails: ride.vehicleDetails
+      }
     });
   };
-  
-  const handleViewRideDetails = (rideId) => {
-    router.push({
-      pathname: '/ride-details',
-      params: { rideId: rideId }
-    });
+  const handleDeleteRide = async (rideId) => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        setError('Authentication required. Please login.');
+        setLoading(false);
+        return;
+      }
+      
+      await axios.delete(`${API_URL}/${rideId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      // Remove ride from state
+      setRides(rides.filter(ride => ride._id !== rideId));
+    } catch (error) {
+      console.error('Error deleting ride:', error);
+      setError(error.response?.data?.message || 'Failed to delete the ride');
+    } finally {
+      setLoading(false);
+    }
   };
   
+ 
   const renderRideCard = ({ item }) => (
     <View style={styles.rideCard}>
       <View style={styles.detailRow}>
@@ -95,10 +122,10 @@ export default function UserRidesPreview() {
       
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={[styles.button, styles.viewButton]} 
-          onPress={() => handleViewRideDetails(item._id)}
+          style={[styles.button, styles.deleteButton]} 
+          onPress={() => handleDeleteRide(item._id)}
         >
-          <Text style={styles.buttonText}>View</Text>
+          <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -170,9 +197,9 @@ export default function UserRidesPreview() {
           
           <TouchableOpacity 
             style={[styles.button, styles.homeButton]} 
-            onPress={handleGoBack}
+            onPress={handleGoToDashboard}
           >
-            <Text style={styles.buttonText}>Home</Text>
+            <Text style={styles.buttonText}>Dashboard</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -185,6 +212,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f5f5f5',
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
   },
   loadingContainer: {
     flex: 1,

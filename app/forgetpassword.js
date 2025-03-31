@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 const API_URL = `http://${BACKEND_URL}:2052/api/auth`; // Replace with API URL
 
 const ForgotPassword = () => {

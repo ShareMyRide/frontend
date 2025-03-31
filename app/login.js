@@ -8,7 +8,7 @@ import axios from "axios";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BACKEND_URL=process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 const login = () => {
   const router = useRouter();
   
@@ -42,12 +42,13 @@ const login = () => {
       // const data = await response.json();
       // console.log("Login successful:", data);
       // alert("Login successful!");
-      router.replace("/dashboard");
+      // router.replace("/dashboard");
 
     // } catch (error) {
     //   console.error("Error during login:", error);
     //   alert("An error occurred. Please try again.");
     // }
+    console.log(BACKEND_URL)
       const response = await axios.post(`http://${BACKEND_URL}:2052/api/auth/login`, {
 
 

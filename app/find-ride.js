@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 // Set your backend API URL here
 
 const API_URL = `http://${BACKEND_URL}:2052`; // Change to your actual backend URL
@@ -30,7 +30,7 @@ const FindRide = () => {
   });
   
   // Google Maps API Key
-  const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY
+  const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
 
   useEffect(() => {
     // Fetch all available rides when component mounts

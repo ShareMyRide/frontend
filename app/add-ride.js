@@ -7,7 +7,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 // Set your backend API URL here
 const API_URL = `http://${BACKEND_URL}:2052/api/ride/start`; // Change to your actual backend URL
 

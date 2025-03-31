@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 const API_URL = `http://${BACKEND_URL}:2052/api/chatbot`; 
 
 const ChatbotApp = () => {

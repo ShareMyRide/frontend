@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 // Set your backend API URL here
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
 
@@ -54,7 +54,7 @@ export default function UserRidesPreview() {
   };
   
   const handleGoBack = () => {
-    router.push('/');
+    router.push('/dashboard');
   };
   
   const handleEditRide = (rideId) => {

@@ -16,7 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import {  useRouter } from "expo-router";
 
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 const API_URL = `http://${BACKEND_URL}:2052`; 
 
 const EditProfile = () => {

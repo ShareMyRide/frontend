@@ -1,40 +1,27 @@
-import React from 'react';
-import { Pressable, Button, Text, View,StyleSheet  } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, Button, Text, View, StyleSheet } from 'react-native';
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Link, useRouter } from "expo-router";
-import axios from 'axios'; // Make sure axios is installed
+import axios from 'axios';
 import { LinearGradient } from "expo-linear-gradient";
 
-
-// Set your backend API URL here
-
-
-const AddRide = () => {
-  const [loading, setLoading] = useState(false);
-  const [routeData, setRouteData] = useState(null);
-
-  // This function will be called when the form is submitted
-
 const register = () => {
-  const router = useRouter(); 
-  
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const onFormSubmit = async (values) => {
     try {
-
+      setLoading(true);
       //const response = await axios.post("http://localhost:2052/api/auth/register", {  
-
-      const response = await axios.post("http://192.168.216.78:2052/api/auth/register", {  // Replace with ur IP
-
+      const response = await axios.post("http://192.168.216.78:2052/api/auth/register", {  // Replace with your IP
         firstname: values.fname,
         lastname: values.lname,
         email: values.email,
         NIC: values.nic,
         password: values.pswrd,
         confirmPassword: values.confPswrd,
-
       });
 
       console.log("Registration successful:", response.data);
@@ -42,14 +29,14 @@ const register = () => {
       router.replace("/login"); 
     } catch (error) {
       if (error.response) {
-
         console.error("Registration failed:", error.response.data.message);
         alert(error.response.data.message || "Registration failed");
       } else {
-
         console.error("Error during registration:", error.message);
         alert("An error occurred. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,7 +49,7 @@ const register = () => {
     >
       <SafeAreaProvider>
         <SafeAreaView>
-          <View className="p-4 h-screen flex items-center justify-center  ">
+          <View className="p-4 h-screen flex items-center justify-center">
             <Text className="text-4xl font-bold text-center">Register</Text>
             <Formik
               initialValues={{
@@ -123,10 +110,11 @@ const register = () => {
                   </View>
                   <View>
                     <Text className="mb-2" style={styles.textLabel}>
-                      Password :{" "}
+                      Password:{" "}
                     </Text>
                     <TextInput
                       className="border"
+                      secureTextEntry
                       onChangeText={handleChange("pswrd")}
                       onBlur={handleBlur("pswrd")}
                       value={values.pswrd}
@@ -134,11 +122,11 @@ const register = () => {
                   </View>
                   <View>
                     <Text className="mb-2" style={styles.textLabel}>
-                      {" "}
-                      Confirm Password :
+                      Confirm Password:
                     </Text>
                     <TextInput
                       className="border"
+                      secureTextEntry
                       onChangeText={handleChange("confPswrd")}
                       onBlur={handleBlur("confPswrd")}
                       value={values.confPswrd}
@@ -146,13 +134,16 @@ const register = () => {
                   </View>
 
                   <View style={styles.buttonContainer}>
-                  <Pressable
-                    style={styles.submitButton}
-                    onPress={handleSubmit}
-                  >
-                    <Text style={styles.buttonText}>SUBMIT</Text>
-                  </Pressable>
-                </View>
+                    <Pressable
+                      style={styles.submitButton}
+                      onPress={handleSubmit}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>
+                        {loading ? "SUBMITTING..." : "SUBMIT"}
+                      </Text>
+                    </Pressable>
+                  </View>
 
                   <Link href="/login" asChild>
                     <Pressable>
@@ -183,7 +174,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f97316", 
     paddingVertical: 14,
     paddingHorizontal: 30,
-   // borderRadius: 15,
     alignItems: "center"
   },
   buttonText: {

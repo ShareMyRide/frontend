@@ -9,11 +9,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native';
 import axios from 'axios';
 
-const API_URL = 'http://172.16.193.119:2052/api/chatbot'; 
+
+const BACKEND_URL = process.env.BACKEND_URL
+const API_URL = `http://${BACKEND_URL}:2052/api/chatbot`; 
+
 
 const ChatbotApp = () => {
   const [categories, setCategories] = useState([]);
@@ -27,6 +31,7 @@ const ChatbotApp = () => {
   ]);
   const [loading, setLoading] = useState(true);
   const [inputMode, setInputMode] = useState('default'); // 'default', 'custom'
+  const [showCategories, setShowCategories] = useState(true); // New state to control category visibility
 
   useEffect(() => {
     // Fetch categories when component mounts
@@ -57,6 +62,7 @@ const ChatbotApp = () => {
     setSelectedQuestion(null);
     setAnswer(null);
     setInputMode('default');
+    setShowCategories(false); // Hide categories after selection
     
     // Add user message
     setMessages(prev => [...prev, {
@@ -193,6 +199,7 @@ const ChatbotApp = () => {
       { id: 1, text: 'Welcome to ShareMyRide! How can I help you today?', isUser: false }
     ]);
     setInputMode('default');
+    setShowCategories(true); // Show categories again when chat is reset
   };
 
   const renderMessage = ({ item }) => {
@@ -220,6 +227,40 @@ const ChatbotApp = () => {
     );
   };
 
+  // Render categories component - now this will be part of the main content, not the input area
+  const renderCategoriesComponent = () => {
+    if (showCategories && !selectedCategory && !loading) {
+      return (
+        <View style={styles.categoriesContainer}>
+          {categories
+            .filter(category => category !== "Custom Message") // Filter out "Custom Message"
+            .map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.categoryButton}
+                onPress={() => handleCategorySelect(category)}
+              >
+                <Text style={styles.categoryButtonText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+        </View>
+      );
+    }
+    return null;
+  };
+
+  // Render greeting message with styling
+  const renderGreeting = () => {
+    if (showCategories && !selectedCategory) {
+      return (
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greetingText}>Welcome to ShareMyRide! How can I help you today?</Text>
+        </View>
+      );
+    }
+    return null;
+  };
+
   return (
     <KeyboardAvoidingView 
       style={styles.container}
@@ -227,19 +268,30 @@ const ChatbotApp = () => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ShareMyRide Assistant</Text>
-        {/* <TouchableOpacity style={styles.resetButton} onPress={resetChat}>
+        <View style={styles.headerContent}>
+
+        </View>
+        <TouchableOpacity style={styles.resetButton} onPress={resetChat}>
           <Text style={styles.resetButtonText}>New Chat</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
       
-      <FlatList
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={item => item.id.toString()}
-        style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesList}
-      />
+      <View style={styles.contentContainer}>
+        {/* Render greeting at the top */}
+        {renderGreeting()}
+        
+        {/* Render categories just below the greeting */}
+        {renderCategoriesComponent()}
+        
+        {/* FlatList for chat messages */}
+        <FlatList
+          data={messages.slice(1)} // Skip the first greeting since we now show it separately
+          renderItem={renderMessage}
+          keyExtractor={item => item.id.toString()}
+          style={styles.messagesContainer}
+          contentContainerStyle={styles.messagesList}
+        />
+      </View>
       
       {loading && (
         <View style={styles.loadingContainer}>
@@ -248,45 +300,32 @@ const ChatbotApp = () => {
       )}
       
       <View style={styles.inputContainer}>
-        {!selectedCategory && !loading ? (
-         // In your React Native code, modify the categories section
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
-        {categories
-            .filter(category => category !== "Custom Message") // Filter out "Custom Message"
-            .map((category, index) => (
+        {!showCategories && (
+          inputMode === 'custom' ? (
+            <View style={styles.customMessageContainer}>
+              <TextInput
+                style={styles.customMessageInput}
+                placeholder="Type your question here..."
+                value={customMessage}
+                onChangeText={setCustomMessage}
+                multiline
+              />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={handleCustomMessageSubmit}
+                disabled={!customMessage.trim()}
+              >
+                <Text style={styles.sendButtonText}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
             <TouchableOpacity
-                key={index}
-                style={styles.categoryButton}
-                onPress={() => handleCategorySelect(category)}
+              style={styles.askMoreButton}
+              onPress={() => setInputMode('custom')}
             >
-                <Text style={styles.categoryButtonText}>{category}</Text>
+              <Text style={styles.askMoreButtonText}>Ask another question</Text>
             </TouchableOpacity>
-            ))}
-        </ScrollView>
-        ) : inputMode === 'custom' ? (
-          <View style={styles.customMessageContainer}>
-            <TextInput
-              style={styles.customMessageInput}
-              placeholder="Type your question here..."
-              value={customMessage}
-              onChangeText={setCustomMessage}
-              multiline
-            />
-            <TouchableOpacity
-              style={styles.sendButton}
-              onPress={handleCustomMessageSubmit}
-              disabled={!customMessage.trim()}
-            >
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.askMoreButton}
-            onPress={() => setInputMode('custom')}
-          >
-            <Text style={styles.askMoreButtonText}>Ask another question</Text>
-          </TouchableOpacity>
+          )
         )}
       </View>
     </KeyboardAvoidingView>
@@ -299,17 +338,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#FF9500',
+    backgroundColor: '#f97316',
     paddingVertical: 16,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  greetingContainer: {
+    backgroundColor: '#FFF8E1',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom:40,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF9500',
+  },
+  greetingText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+  categoriesContainer: {
+    marginTop: 16,
+    marginBottom: 16,
   },
   resetButton: {
     padding: 8,
@@ -322,7 +392,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messagesList: {
-    padding: 16,
+    paddingVertical: 16,
   },
   messageContainer: {
     padding: 12,
@@ -331,7 +401,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
   },
   userMessageContainer: {
-    backgroundColor: '#FF9500',
+    backgroundColor: '#f97316',
     alignSelf: 'flex-end',
     borderBottomRightRadius: 0,
   },
@@ -360,19 +430,21 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
   },
-  categoriesContainer: {
-    flexDirection: 'row',
-  },
   categoryButton: {
-    backgroundColor: '#FF9500',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    marginRight: 8,
+    backgroundColor: '#f97316',
+    paddingVertical: 15,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    marginLeft:80,
+    marginTop:15,
+    marginBottom: 10, // Reduced spacing between category buttons
+    alignSelf: 'stretch', // Make buttons stretch horizontally
   },
   categoryButtonText: {
     color: 'white',
     fontWeight: '600',
+    textAlign: 'center',
+    fontSize: 14,
   },
   questionButton: {
     backgroundColor: '#F0F0F0',
@@ -398,7 +470,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   sendButton: {
-    backgroundColor: '#FF9500',
+    backgroundColor: '#f97316',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -409,7 +481,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   askMoreButton: {
-    backgroundColor: '#FF9500',
+    backgroundColor: '#f97316',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 20,

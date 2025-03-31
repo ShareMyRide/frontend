@@ -7,14 +7,16 @@ import { Link, useRouter } from "expo-router";
 import axios from 'axios'; // Make sure axios is installed
 import { LinearGradient } from "expo-linear-gradient";
 
+const BACKEND_URL = process.env.BACKEND_URL
 const register = () => {
   const router = useRouter(); 
+  
   const onFormSubmit = async (values) => {
     try {
 
       //const response = await axios.post("http://localhost:2052/api/auth/register", {  
 
-      const response = await axios.post("http://192.168.216.78:2052/api/auth/register", {  // Replace with ur IP
+      const response = await axios.post(`http://${BACKEND_URL}:2052/api/auth/register`, {  // Replace with ur IP
 
         firstname: values.fname,
         lastname: values.lname,

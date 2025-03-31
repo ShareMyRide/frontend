@@ -14,7 +14,7 @@ const login = () => {
   const onFormSubmit = async (values) => {
     try {
       console.log("Submitting login values:", values);
-      const response = await axios.post("http://172.16.193.119:2052/api/auth/login", {
+      const response = await axios.post("http://192.168.230.205:2052/api/auth/login", {
         email: values.email,
         password: values.pswrd,
       });

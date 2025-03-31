@@ -143,9 +143,7 @@ const login = () => {
                 <Link href="/forgetpassword" asChild>
                   <Text>Forget password</Text>
                 </Link>
-                <Link href="/forgetpassword" asChild>
-                  <Text>Forget password</Text>
-                </Link>
+                
               </View>
             )}
           </Formik>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { router } from 'expo-router';
+import { router,useNavigation  } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -10,14 +10,15 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
 
-export default function UserRidesPreview() {
+export default function UserRidesPreview({ jumpTo, user }) {
+
   const [loading, setLoading] = useState(true);
   const [rides, setRides] = useState([]);
   const [error, setError] = useState(null);
   
   useEffect(() => {
     fetchUserRides();
-  }, []);
+  }, [user]);
   
   const fetchUserRides = async () => {
     try {
@@ -56,6 +57,7 @@ export default function UserRidesPreview() {
   
   const handleGoBack = () => {
     router.push('/dashboard');
+
   };
   
   const handleEditRide = (ride) => {
@@ -172,7 +174,7 @@ export default function UserRidesPreview() {
             <Text style={styles.emptyText}>You haven't created any rides yet.</Text>
             <TouchableOpacity 
               style={[styles.button, styles.createButton]} 
-              onPress={() => router.push('/add-ride')}
+              onPress={handleAddRide}
             >
               <Text style={styles.buttonText}>Create a Ride</Text>
             </TouchableOpacity>
@@ -190,7 +192,7 @@ export default function UserRidesPreview() {
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity 
             style={[styles.button, styles.addButton]} 
-            onPress={() => router.push('/add-ride')}
+            onPress={handleAddRide}
           >
             <Text style={styles.buttonText}>Add New Ride</Text>
           </TouchableOpacity>

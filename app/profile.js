@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator,Pressable } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { router } from "expo-router";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [rideData, setRideData] = useState(null);
   const params = useLocalSearchParams();
   
  
@@ -69,6 +71,47 @@ const Profile = () => {
       await AsyncStorage.setItem("userData", JSON.stringify(response.data));
       
       setUserData(response.data);
+      if (response.data && (response.data.id || response.data._id)) {
+        // Fetch the most recent ride for this user
+        const userId = response.data.id || response.data._id;
+        
+        try {
+          const rideResponse = await axios.get(
+            `http://192.168.216.78:2052/api/ride/latestByUser/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          console.log("Fetched ride data:", rideResponse.data);
+          setRideData(rideResponse.data);
+          
+          // Update the user data with vehicle details if not already present
+          if (rideResponse.data && !response.data.vehicleDetails) {
+            const updatedUserData = {
+              ...response.data,
+              vehicleType: rideResponse.data.vehicleType,
+              vehicleNumber: rideResponse.data.vehicleNumber,
+              vehicleDetails: `${rideResponse.data.vehicleType || 'Unknown'} (${rideResponse.data.vehicleNumber || 'No plate number'})`
+            };
+            
+            setUserData(updatedUserData);
+            await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
+          } else {
+            setUserData(response.data);
+            await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+          }
+        } catch (rideError) {
+          console.error("Error fetching ride data:", rideError);
+          // Still use the user data even if ride fetch fails
+          setUserData(response.data);
+          await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+        }
+      }
+      
+      setLoading(false);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -176,6 +219,12 @@ const Profile = () => {
               </View>
             </View>
             <View style={styles.detailContainer}>
+              <Text style={styles.detailLabel}>Contact Number:</Text>
+              <View style={styles.detailBox}>
+                <Text style={styles.detailValue}>{userData.mobileNumber || "Not provided"}</Text>
+              </View>
+            </View>
+            <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Address:</Text>
               <View style={styles.detailBox}>
                 <Text style={styles.detailValue}>
@@ -184,13 +233,28 @@ const Profile = () => {
               </View>
             </View>
             <View style={styles.detailContainer}>
-              <Text style={styles.detailLabel}>Vehicle Details:</Text>
-              <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>
-                  {userData.vehicleDetails || "Vehicle details not provided"}
+            <Text style={styles.detailLabel}>Vehicle Details:</Text>
+            <View style={styles.detailBox}>
+            <Text style={styles.detailValue}>
+              {userData.vehicleDetails || 
+              (userData.vehicleType && userData.vehicleNumber 
+                ? `${userData.vehicleType} (${userData.vehicleNumber})` 
+                : (rideData && rideData.vehicleType 
+                    ? `${rideData.vehicleType} (${rideData.vehicleNumber || 'No plate number'})` 
+                    : "Vehicle details not provided"))}
                 </Text>
               </View>
             </View>
+          </View>
+           <View style={styles.buttonContainer}>
+                        <Pressable
+                          onPress={() => {
+                            router.push("/editProfile");
+                          }}
+                          style={styles.editButton}
+                        >
+                          <Text style={styles.buttonText}>Edit Profile</Text>
+                        </Pressable>
           </View>
 
           <View style={styles.navigationLinks}>
@@ -291,6 +355,24 @@ const styles = StyleSheet.create({
     color: "#d32f2f",
     fontWeight: "bold",
     textDecorationLine: "underline",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 20,
+    marginTop: 20,
+  },
+  editButton: {
+    backgroundColor: "#F97316", 
+    width: "100%",
+    padding: 16,
+    justifyContent: "center",
+    borderRadius: 999, 
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
   },
 });
 

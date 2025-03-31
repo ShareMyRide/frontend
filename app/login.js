@@ -15,8 +15,9 @@ const login = () => {
     try {
       console.log("Submitting login values:", values);
 
+      
 
-      const response = await axios.post("http://192.168.237.127:2052/api/auth/login", {
+ 
 
       // const response = await fetch("http://localhost:2052/api/auth/login", {
       //   method: "POST",
@@ -142,9 +143,7 @@ const login = () => {
                 <Link href="/forgetpassword" asChild>
                   <Text>Forget password</Text>
                 </Link>
-                <Link href="/forgetpassword" asChild>
-                  <Text>Forget password</Text>
-                </Link>
+                
               </View>
             )}
           </Formik>

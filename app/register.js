@@ -13,10 +13,8 @@ const register = () => {
     try {
 
       //const response = await axios.post("http://localhost:2052/api/auth/register", {  
-      const response = await axios.post("http://192.168.237.127:2052/api/auth/register", {  // Replace with ur IP
 
-
-      //const response = await axios.post("http://localhost:2052/api/auth/register", {  
+      const response = await axios.post("http://192.168.216.78:2052/api/auth/register", {  // Replace with ur IP
 
         firstname: values.fname,
         lastname: values.lname,
@@ -29,7 +27,7 @@ const register = () => {
 
       console.log("Registration successful:", response.data);
       alert("Registration successful");
-      router.replace("/bottom-navi"); 
+      router.replace("/login"); 
     } catch (error) {
       if (error.response) {
 

@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Set your backend API URL here
-const API_URL = 'http://172.16.193.119:2052/api/ride'; // Change to your actual backend URL
+const API_URL = 'http://192.168.216.78:2052/api/ride'; // Change to your actual backend URL
 
 export default function UserRidesPreview() {
   const [loading, setLoading] = useState(true);

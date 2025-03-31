@@ -140,7 +140,7 @@ const Dashboard = ({ user }) => {
                 <Text style={styles.menuItemText}>Your Rides</Text>
               </View>
             </Pressable>
-            <Pressable
+            {/* <Pressable
               onPress={() => {
                 router.push("/chatbot");
                 toggleMenu();
@@ -150,7 +150,7 @@ const Dashboard = ({ user }) => {
                 <Ionicons name="chatbubble-ellipses" size={18} color="#f97316" style={{marginRight: 10}} />
                 <Text style={styles.menuItemText}>Support Chat</Text>
               </View>
-            </Pressable>
+            </Pressable> */}
             <Pressable
               onPress={() => {
                 router.push("/login");

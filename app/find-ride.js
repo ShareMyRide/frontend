@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
 // Set your backend API URL here
-const API_URL = 'http://172.16.193.119:2052'; // Change to your actual backend URL
+const API_URL = 'http://192.168.216.78:2052'; // Change to your actual backend URL
 
 const FindRide = () => {
   const [startLocation, setStartLocation] = useState('');

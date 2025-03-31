@@ -8,7 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Set your backend API URL here
 const API_URL = 'http://192.168.216.200:2052/api/ride'; // Change to your actual backend URL
 
+
 export default function UserRidesPreview({ jumpTo, user }) {
+
   const [loading, setLoading] = useState(true);
   const [rides, setRides] = useState([]);
   const [error, setError] = useState(null);

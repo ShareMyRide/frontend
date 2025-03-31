@@ -15,7 +15,41 @@ const login = () => {
     try {
       console.log("Submitting login values:", values);
 
+      
+
+ 
+
+      // const response = await fetch("http://localhost:2052/api/auth/login", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     email: values.email,
+      //     password: values.pswrd,
+      //   }),
+      // });
+
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   console.error("Login failed:", errorData.message);
+      //   alert(errorData.message || "Login failed");
+      //   return;
+      // }
+
+
+      // const data = await response.json();
+      // console.log("Login successful:", data);
+      // alert("Login successful!");
+      router.replace("/dashboard");
+
+    // } catch (error) {
+    //   console.error("Error during login:", error);
+    //   alert("An error occurred. Please try again.");
+    // }
       const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
+
+
 
         email: values.email,
         password: values.pswrd,
@@ -49,6 +83,7 @@ const login = () => {
         alert("An error occurred. Please try again.");
       }
     }
+
   };
 
   return (
@@ -104,6 +139,9 @@ const login = () => {
 
                   <Text>Haven't an account? Create Account</Text>
 
+                </Link>
+                <Link href="/forgetpassword" asChild>
+                  <Text>Forget password</Text>
                 </Link>
                 <Link href="/forgetpassword" asChild>
                   <Text>Forget password</Text>

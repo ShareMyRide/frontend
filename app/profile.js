@@ -6,6 +6,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { router } from "expo-router";
 
+
+
+
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,6 +63,7 @@ const Profile = () => {
       console.log("Fetching detailed user data for ID:", userId);
 
       const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -195,27 +199,34 @@ const Profile = () => {
             <Text style={styles.profileName}>
               {userData.firstname || userData.username || "User"} {userData.lastname || ""}
             </Text>
+
           </View>
 
           <View style={styles.profileDetails}>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>
                   {userData.firstname || userData.username || "User"} {userData.lastname || ""}
                 </Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
@@ -227,12 +238,15 @@ const Profile = () => {
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Address:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>
                   {userData.address || "Address not provided"}
                 </Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
+
             <Text style={styles.detailLabel}>Vehicle Details:</Text>
             <View style={styles.detailBox}>
             <Text style={styles.detailValue}>
@@ -242,7 +256,9 @@ const Profile = () => {
                 : (rideData && rideData.vehicleType 
                     ? `${rideData.vehicleType} (${rideData.vehicleNumber || 'No plate number'})` 
                     : "Vehicle details not provided"))}
+
                 </Text>
+
               </View>
             </View>
           </View>
@@ -261,6 +277,11 @@ const Profile = () => {
             <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
+            <TouchableOpacity style={styles.editButton} onPress={handleEditToggle}>
+              <Text style={styles.editButtonText}>
+                {profile.isEditing ? "Save" : "Edit Profile"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -356,24 +377,36 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecorationLine: "underline",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    gap: 20,
-    marginTop: 20,
+
+  editableInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 18,
+    color: "#333",
+  },
+  editableName: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#333",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 5,
+    borderRadius: 5,
   },
   editButton: {
-    backgroundColor: "#F97316", 
-    width: "100%",
-    padding: 16,
-    justifyContent: "center",
-    borderRadius: 999, 
+    marginTop: 20,
+    backgroundColor: "#d32f2f",
+    padding: 10,
+    borderRadius: 5,
   },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+  editButtonText: {
     color: "white",
-    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
-export default Profile;
+export default profile;
+

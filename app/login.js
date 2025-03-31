@@ -16,6 +16,7 @@ const login = () => {
     try {
       console.log("Submitting login values:", values);
 
+
       
 
  
@@ -49,7 +50,6 @@ const login = () => {
     //   alert("An error occurred. Please try again.");
     // }
       const response = await axios.post(`http://${BACKEND_URL}:2052/api/auth/login`, {
-
 
 
         email: values.email,

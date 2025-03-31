@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 const BACKEND_URL = process.env.BACKEND_URL
 const register = () => {
   const router = useRouter(); 
+  
   const onFormSubmit = async (values) => {
     try {
 

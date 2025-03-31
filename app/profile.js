@@ -6,8 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { router } from "expo-router";
 
-
-
+const BACKEND_URL = process.env.BACKEND_URL
 
 const profile = () => {
   const [userData, setUserData] = useState(null);
@@ -62,7 +61,7 @@ const profile = () => {
       
       console.log("Fetching detailed user data for ID:", userId);
 
-      const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+      const response = await axios.get(`http://${BACKEND_URL}:2052/api/auth/users/${userId}`, {
 
         headers: {
           Authorization: `Bearer ${token}`,
@@ -81,7 +80,7 @@ const profile = () => {
         
         try {
           const rideResponse = await axios.get(
-            `http://192.168.216.78:2052/api/ride/latestByUser/${userId}`,
+            `http://${BACKEND_URL}:2052/api/ride/latestByUser/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

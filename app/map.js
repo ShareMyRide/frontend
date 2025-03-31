@@ -6,7 +6,7 @@ import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 
 // Google Maps API Key
-const GOOGLE_MAPS_API_KEY = "AIzaSyAiQ_WJER_3HDCs0B6tH01WPTCzB1COSLA";
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 export default function map() {
   const [startLocation, setStartLocation] = useState('');

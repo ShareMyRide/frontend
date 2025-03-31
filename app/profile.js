@@ -5,6 +5,9 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
+
+
+
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,6 +61,7 @@ const Profile = () => {
       console.log("Fetching detailed user data for ID:", userId);
 
       const response = await axios.get(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
+
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -152,43 +156,54 @@ const Profile = () => {
             <Text style={styles.profileName}>
               {userData.firstname || userData.username || "User"} {userData.lastname || ""}
             </Text>
+
           </View>
 
           <View style={styles.profileDetails}>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>
                   {userData.firstname || userData.username || "User"} {userData.lastname || ""}
                 </Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Address:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>
                   {userData.address || "Address not provided"}
                 </Text>
+
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Vehicle Details:</Text>
               <View style={styles.detailBox}>
+
                 <Text style={styles.detailValue}>
                   {userData.vehicleDetails || "Vehicle details not provided"}
                 </Text>
+
               </View>
             </View>
           </View>
@@ -197,6 +212,11 @@ const Profile = () => {
             <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
+            <TouchableOpacity style={styles.editButton} onPress={handleEditToggle}>
+              <Text style={styles.editButtonText}>
+                {profile.isEditing ? "Save" : "Edit Profile"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -292,6 +312,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecorationLine: "underline",
   },
+  editableInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 18,
+    color: "#333",
+  },
+  editableName: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#333",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 5,
+    borderRadius: 5,
+  },
+  editButton: {
+    marginTop: 20,
+    backgroundColor: "#d32f2f",
+    padding: 10,
+    borderRadius: 5,
+  },
+  editButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
 
-export default Profile;
+export default profile;
+

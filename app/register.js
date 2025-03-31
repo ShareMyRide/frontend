@@ -11,14 +11,20 @@ const register = () => {
   const router = useRouter(); 
   const onFormSubmit = async (values) => {
     try {
+
       //const response = await axios.post("http://localhost:2052/api/auth/register", {  
       const response = await axios.post("http://192.168.237.127:2052/api/auth/register", {  // Replace with ur IP
+
+
+      //const response = await axios.post("http://localhost:2052/api/auth/register", {  
+
         firstname: values.fname,
         lastname: values.lname,
         email: values.email,
         NIC: values.nic,
         password: values.pswrd,
         confirmPassword: values.confPswrd,
+
       });
 
       console.log("Registration successful:", response.data);

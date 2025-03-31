@@ -14,62 +14,28 @@ const login = () => {
   const onFormSubmit = async (values) => {
     try {
       console.log("Submitting login values:", values);
-
       
-
- 
-
-      // const response = await fetch("http://localhost:2052/api/auth/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     email: values.email,
-      //     password: values.pswrd,
-      //   }),
-      // });
-
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   console.error("Login failed:", errorData.message);
-      //   alert(errorData.message || "Login failed");
-      //   return;
-      // }
-
-
-      // const data = await response.json();
-      // console.log("Login successful:", data);
-      // alert("Login successful!");
-      router.replace("/dashboard");
-
-    // } catch (error) {
-    //   console.error("Error during login:", error);
-    //   alert("An error occurred. Please try again.");
-    // }
+  
       const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
-
-
-
         email: values.email,
         password: values.pswrd,
       });
       
       console.log("Login successful:", response.data);
       
-     
-      await AsyncStorage.setItem("token", response.data.token);
+      // Store the token with the CORRECT KEY that matches logout function
+      await AsyncStorage.setItem("authToken", response.data.token);
       await AsyncStorage.setItem("userId", response.data.user.id);
-      
-     
       await AsyncStorage.setItem("userData", JSON.stringify(response.data.user));
+      
+      
+      const storedToken = await AsyncStorage.getItem("authToken");
+      console.log("Token stored successfully:", storedToken ? "Yes" : "No");
+      
       
       alert("Login successful!");
       
-     
       const userData = JSON.stringify(response.data.user);
-      
-     
       router.replace({
         pathname: "/bottom-navi",
         params: { user: userData }
@@ -83,7 +49,6 @@ const login = () => {
         alert("An error occurred. Please try again.");
       }
     }
-
   };
 
   return (

@@ -51,6 +51,9 @@ const Dashboard = ({ user }) => {
       toggleMenu();
     }
   };
+  const navigateToEditProfile = () => {
+    router.push("/editProfile");
+  };
 
   const navigateToChatbot = () => {
     router.push("/chatbot");
@@ -122,7 +125,7 @@ const Dashboard = ({ user }) => {
                 <Text style={styles.menuItemText}>View Profile</Text>
               </View>
             </Pressable>
-            <Pressable onPress={navigateToProfile}>
+            <Pressable onPress={navigateToEditProfile}>
               <View style={styles.menuItem}>
                 <Text style={styles.menuItemText}>Edit Profile</Text>
               </View>

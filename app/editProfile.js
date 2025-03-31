@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   Text,
@@ -7,18 +7,27 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Link } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import {  useRouter } from "expo-router";
 
-const editProfile = () => {
+const API_URL = "http://192.168.216.78:2052"; 
+
+const EditProfile = () => {
+    const router = useRouter();
   const [profile, setProfile] = useState({
-    name: "John Doe",
-    fullName: "John Michael Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "+1 (555) 123-4567",
-    address: "123 Main St, Anytown, CA 91234, USA",
-    vehicle: "2022 Honda Civic, License Plate: ABC-1234",
+    name: "",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    nicNumber: "",
+    
     imageUrl: require("../assets/images/images.jpeg"),
     isEditing: {
       name: false,
@@ -27,9 +36,85 @@ const editProfile = () => {
       phoneNumber: false,
       address: false,
       vehicle: false,
+      nicNumber: false,
     },
-    nicNumber: "123456789V",
+    
   });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+ 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      
+    
+      const userDataString = await AsyncStorage.getItem("userData");
+      
+      if (userDataString) {
+        
+        const userData = JSON.parse(userDataString);
+        console.log("User data from storage:", userData);
+        
+        
+        updateProfileFromUserData(userData);
+      }
+      
+     
+      const token = await AsyncStorage.getItem("token");
+      const userId = await AsyncStorage.getItem("userId");
+      
+      console.log("Token:", token);
+      console.log("UserId:", userId);
+      
+      if (!token || !userId) {
+        throw new Error("Not authenticated");
+      }
+      
+     
+      const response = await axios.get(
+        `${API_URL}/api/auth/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log("API response:", response.data);
+      
+      
+      updateProfileFromUserData(response.data);
+      
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      setError("Failed to load profile data. Please log in again.");
+      setLoading(false);
+    }
+  };
+  
+  const updateProfileFromUserData = (userData) => {
+   
+    const fullName = userData.firstname && userData.lastname 
+      ? `${userData.firstname} ${userData.lastname}`
+      : userData.username || ""; 
+    
+    setProfile({
+      ...profile,
+      name: fullName,
+      fullName: fullName,
+      email: userData.email || "",
+      phoneNumber: userData.mobileNumber || "",
+      address: userData.address || "",
+      nicNumber: userData.NIC || "",
+    });
+  };
 
   const handleFieldPress = (field) => {
     setProfile({
@@ -42,19 +127,104 @@ const editProfile = () => {
     setProfile({ ...profile, [field]: value });
   };
 
-  const handleSave = () => {
-    setProfile({
-      ...profile,
-      isEditing: {
-        name: false,
-        fullName: false,
-        email: false,
-        phoneNumber: false,
-        address: false,
-        vehicle: false,
-      },
-    });
+  const handleSave = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const userId = await AsyncStorage.getItem("userId");
+      
+      if (!token || !userId) {
+        Alert.alert("Error", "Not authenticated. Please log in again.");
+        return;
+      }
+      
+      
+      let firstname = "", lastname = "";
+      if (profile.fullName) {
+        const nameParts = profile.fullName.split(" ");
+        firstname = nameParts[0];
+        lastname = nameParts.slice(1).join(" ");
+      }
+      
+      
+      const userData = {
+        firstname,
+        lastname,
+        email: profile.email,
+        mobileNumber: profile.phoneNumber,
+        NIC: profile.nicNumber,
+        address: profile.address,
+        
+      };
+      
+      console.log("Updating profile with data:", userData);
+      
+     
+      const response = await axios.put(
+        `${API_URL}/api/auth/editProfile/${userId}`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      
+      console.log("Update response:", response.data);
+      
+      
+      const updatedUser = response.data.updateUser || response.data.user;
+      if (updatedUser) {
+        await AsyncStorage.setItem("userData", JSON.stringify(updatedUser));
+      }
+      
+      
+      setProfile({
+        ...profile,
+        isEditing: {
+          name: false,
+          fullName: false,
+          email: false,
+          phoneNumber: false,
+          address: false,
+          nicNumber: false,
+         
+        },
+      });
+      
+      Alert.alert("Success", "Profile updated successfully", [
+        { 
+          text: "OK", 
+          onPress: () => {
+            router.push("/profile");
+          } 
+        }
+      ]);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      Alert.alert("Error", err.response?.data?.message || "Failed to update profile");
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#d32f2f" />
+        <Text style={styles.loadingText}>Loading profile data...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={fetchUserData}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>
@@ -62,9 +232,9 @@ const editProfile = () => {
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.profileHeader}>
             <Image source={profile.imageUrl} style={styles.profileImage} />
-            <Text>
-                {profile.name}
-              </Text>
+            <Text style={styles.profileName}>
+              {profile.name}
+            </Text>
           </View>
 
           <View style={styles.profileDetails}>
@@ -89,8 +259,6 @@ const editProfile = () => {
                 />
               </View>
             </View>
-
-            {/* ... (Email, Phone Number, Address, Vehicle - same pattern) */}
 
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
@@ -158,43 +326,38 @@ const editProfile = () => {
               </View>
             </View>
 
-            <View style={styles.detailContainer}>
-              <Text style={styles.detailLabel}>Vehicle Details:</Text>
-              <View style={styles.detailBox}>
-                <TextInput
-                  style={styles.editableInput}
-                  value={profile.vehicle}
-                  multiline
-                  onChangeText={(text) => handleInputChange("vehicle", text)}
-                  onBlur={() =>
-                    setProfile({
-                      ...profile,
-                      isEditing: { ...profile.isEditing, vehicle: false },
-                    })
-                  }
-                  autoFocus={profile.isEditing.vehicle}
-                  onPressIn={() => handleFieldPress("vehicle")}
-                />
-              </View>
-            </View>
+           
 
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>NIC Number:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>{profile.nicNumber}</Text>
-              </View>
+              <TextInput
+      style={styles.editableInput}
+      value={profile.nicNumber}
+      onChangeText={(text) => handleInputChange("nicNumber", text)}
+      onBlur={() =>
+        setProfile({
+          ...profile,
+          isEditing: { ...profile.isEditing, nicNumber: false },
+        })
+      }
+      autoFocus={profile.isEditing.nicNumber}
+      onPressIn={() => handleFieldPress("nicNumber")}
+    />              
+    </View>
             </View>
           </View>
 
           <View style={styles.navigationLinks}>
-            <Link href="/review" asChild>
+            
+            <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>Save</Text>
+              <Link href="/review" asChild>
               <Text style={styles.reviewLink}>View Reviews</Text>
             </Link>
-                    
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-          </View>
+            </TouchableOpacity>
+          </View></View>
                     
         </ScrollView>
       </SafeAreaView>
@@ -211,6 +374,29 @@ const styles = StyleSheet.create({
       flexGrow: 1,
       alignItems: "center",
       padding: 20,
+    },
+    centered: {
+      justifyContent: 'center',
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: "#555",
+    },
+    errorText: {
+      fontSize: 16,
+      color: "#d32f2f",
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    retryButton: {
+      backgroundColor: "#d32f2f",
+      padding: 10,
+      borderRadius: 5,
+    },
+    retryButtonText: {
+      color: "white",
+      fontWeight: "bold",
     },
     profileHeader: {
       alignItems: "center",
@@ -250,6 +436,7 @@ const styles = StyleSheet.create({
     detailValue: {
       fontSize: 18,
       color: "#333",
+      padding: 10,
     },
     navigationLinks: {
       marginTop: 30,
@@ -262,8 +449,6 @@ const styles = StyleSheet.create({
       textDecorationLine: "underline",
     },
     editableInput: {
-      borderWidth: 1,
-      borderColor: "#ccc",
       padding: 10,
       borderRadius: 5,
       fontSize: 18,
@@ -277,22 +462,25 @@ const styles = StyleSheet.create({
       borderColor: "#ccc",
       padding: 5,
       borderRadius: 5,
-    }, saveButton: {
+    }, 
+    buttonContainer: {
+      flexDirection: "row",
+      gap: 20,
       marginTop: 20,
-      backgroundColor: "#d32f2f",
-      padding: 10,
-      borderRadius: 5,
     },
-    editButtonText: {
-      color: "white",
-      fontWeight: "bold",
-      fontSize: 16,
+    saveButton: {
+      backgroundColor: "#F97316", 
+      width: "100%",
+      padding: 16,
+      justifyContent: "center",
+     
     },
     saveButtonText: {
-    color: "white",
+      fontSize: 18,
     fontWeight: "bold",
-    fontSize: 16,
+    color: "white",
+    textAlign: "center",
     },
 });
 
-export default editProfile;
+export default EditProfile;

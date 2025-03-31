@@ -15,7 +15,8 @@ import {
 import axios from 'axios';
 
 
-const API_URL = 'http://192.168.216.200:2052/api/chatbot'; 
+const BACKEND_URL = process.env.BACKEND_URL
+const API_URL = `http://${BACKEND_URL}:2052/api/chatbot`; 
 
 
 const ChatbotApp = () => {

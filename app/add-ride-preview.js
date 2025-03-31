@@ -5,9 +5,10 @@ import { router } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const BACKEND_URL = process.env.BACKEND_URL
 // Set your backend API URL here
-const API_URL = 'http://192.168.216.200:2052/api/ride'; // Change to your actual backend URL
 
+const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
 
 export default function UserRidesPreview() {
   const [loading, setLoading] = useState(true);

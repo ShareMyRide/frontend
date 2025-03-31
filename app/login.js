@@ -8,6 +8,7 @@ import axios from "axios";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const BACKEND_URL=process.env.BACKEND_URL
 const login = () => {
   const router = useRouter();
   
@@ -48,7 +49,7 @@ const login = () => {
     //   console.error("Error during login:", error);
     //   alert("An error occurred. Please try again.");
     // }
-      const response = await axios.post("http://192.168.216.78:2052/api/auth/login", {
+      const response = await axios.post(`http://${BACKEND_URL}:2052/api/auth/login`, {
 
 
         email: values.email,

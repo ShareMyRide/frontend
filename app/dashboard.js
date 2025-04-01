@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+const BACKEND_URL = process.env.BACKEND_URL;
 
 const Dashboard = ({ user }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -73,7 +74,7 @@ const Dashboard = ({ user }) => {
       if (token) {
         // Call the logout API endpoint
         try {
-          const response = await fetch("http://192.168.216.78:2052/api/auth/logout", {
+          const response = await fetch("http://${BACKEND_URL}:2052/api/auth/logout", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

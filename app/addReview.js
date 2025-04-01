@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
+const BACKEND_URL = process.env.BACKEND_URL
 const AddReview = ({ appName }) => {
   const [rating, setRating] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(true);

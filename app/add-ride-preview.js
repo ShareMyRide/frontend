@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { router } from 'expo-router';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Link, router } from "expo-router";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 // Set your backend API URL here
 
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
@@ -14,53 +21,53 @@ export default function UserRidesPreview() {
   const [loading, setLoading] = useState(true);
   const [rides, setRides] = useState([]);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     fetchUserRides();
   }, []);
-  
+
   const fetchUserRides = async () => {
     try {
       setLoading(true);
-      
+
       // Get the token from storage
-      const token = await AsyncStorage.getItem('token');
-      
+      const token = await AsyncStorage.getItem("token");
+
       if (!token) {
-        setError('Authentication required. Please login.');
+        setError("Authentication required. Please login.");
         setLoading(false);
         return;
       }
-      
+
       // Use the endpoint for getting all rides by the logged-in user
       // You'll need to create this endpoint on your backend if it doesn't exist
       const response = await axios.get(`${API_URL}/user/rides`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       console.log("User rides received:", response.data);
       setRides(response.data);
     } catch (error) {
-      console.error('Error fetching user rides:', error);
+      console.error("Error fetching user rides:", error);
       if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", error.response.data);
       }
-      setError(error.response?.data?.message || 'Failed to load your rides');
+      setError(error.response?.data?.message || "Failed to load your rides");
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleGoBack = () => {
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
-  
+
   const handleEditRide = (ride) => {
     router.push({
-      pathname: '/add-ride',
+      pathname: "/add-ride",
       params: {
         editRideId: ride._id,
         startingPoint: ride.startingPoint,
@@ -69,67 +76,70 @@ export default function UserRidesPreview() {
         beginningTime: ride.beginningTime,
         seatsAvailable: ride.seatsAvailable,
         price: ride.price,
-        vehicleDetails: ride.vehicleDetails
-      }
+        vehicleDetails: ride.vehicleDetails,
+      },
     });
   };
   const handleDeleteRide = async (rideId) => {
     try {
       setLoading(true);
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       if (!token) {
-        setError('Authentication required. Please login.');
+        setError("Authentication required. Please login.");
         setLoading(false);
         return;
       }
-      
+
       await axios.delete(`${API_URL}/${rideId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       // Remove ride from state
-      setRides(rides.filter(ride => ride._id !== rideId));
+      setRides(rides.filter((ride) => ride._id !== rideId));
     } catch (error) {
-      console.error('Error deleting ride:', error);
-      setError(error.response?.data?.message || 'Failed to delete the ride');
+      console.error("Error deleting ride:", error);
+      setError(error.response?.data?.message || "Failed to delete the ride");
     } finally {
       setLoading(false);
     }
   };
-  
- 
+
   const renderRideCard = ({ item }) => (
     <View style={styles.rideCard}>
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>From:</Text>
         <Text style={styles.detailValue}>{item.startingPoint}</Text>
       </View>
-      
+
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>To:</Text>
         <Text style={styles.detailValue}>{item.endingPoint}</Text>
       </View>
-      
+
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>Date:</Text>
         <Text style={styles.detailValue}>{item.date}</Text>
       </View>
-      
+
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>Time:</Text>
         <Text style={styles.detailValue}>{item.beginningTime}</Text>
       </View>
-      
+
+      <TouchableOpacity onPress={() => router.push("/requests")}>
+        <Text>Requests</Text>
+      </TouchableOpacity>
+
       <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={[styles.button, styles.deleteButton]} 
+        <TouchableOpacity
+          style={[styles.button, styles.deleteButton]}
           onPress={() => handleDeleteRide(item._id)}
         >
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.editButton]} 
+
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
           onPress={() => handleEditRide(item._id)}
         >
           <Text style={styles.buttonText}>Edit</Text>
@@ -137,7 +147,7 @@ export default function UserRidesPreview() {
       </View>
     </View>
   );
-  
+
   if (loading) {
     return (
       <SafeAreaProvider>
@@ -148,7 +158,7 @@ export default function UserRidesPreview() {
       </SafeAreaProvider>
     );
   }
-  
+
   if (error) {
     return (
       <SafeAreaProvider>
@@ -161,18 +171,20 @@ export default function UserRidesPreview() {
       </SafeAreaProvider>
     );
   }
-  
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Your Rides</Text>
-        
+
         {rides.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>You haven't created any rides yet.</Text>
-            <TouchableOpacity 
-              style={[styles.button, styles.createButton]} 
-              onPress={() => router.push('/add-ride')}
+            <Text style={styles.emptyText}>
+              You haven't created any rides yet.
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, styles.createButton]}
+              onPress={() => router.push("/add-ride")}
             >
               <Text style={styles.buttonText}>Create a Ride</Text>
             </TouchableOpacity>
@@ -186,18 +198,18 @@ export default function UserRidesPreview() {
             showsVerticalScrollIndicator={false}
           />
         )}
-        
+
         <View style={styles.bottomButtonContainer}>
-          <TouchableOpacity 
-            style={[styles.button, styles.addButton]} 
-            onPress={() => router.push('/add-ride')}
+          <TouchableOpacity
+            style={[styles.button, styles.addButton]}
+            onPress={() => router.push("/add-ride")}
           >
             <Text style={styles.buttonText}>Add New Ride</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, styles.homeButton]} 
-            onPress={handleGoToDashboard}
+
+          <TouchableOpacity
+            style={[styles.button, styles.homeButton]}
+            onPress={handleGoBack}
           >
             <Text style={styles.buttonText}>Dashboard</Text>
           </TouchableOpacity>
@@ -211,16 +223,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   deleteButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: "#dc3545",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   loadingText: {
     marginTop: 12,
@@ -228,76 +240,76 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 16,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 24,
-    color: '#333',
+    color: "#333",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 80,
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   rideList: {
     paddingBottom: 80,
   },
   rideCard: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   detailRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   detailLabel: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: "500",
+    color: "#666",
   },
   detailValue: {
     flex: 2,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 12,
   },
   bottomButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    position: 'absolute',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
     bottom: 16,
     left: 16,
     right: 16,
@@ -306,29 +318,29 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 8,
   },
   viewButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
   },
   editButton: {
-    backgroundColor: '#f0ad4e',
+    backgroundColor: "#f0ad4e",
   },
   createButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: "#28a745",
     paddingHorizontal: 32,
   },
   addButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: "#28a745",
   },
   homeButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: "#6c757d",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
-  }
+    fontWeight: "bold",
+  },
 });

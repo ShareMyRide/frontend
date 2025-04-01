@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -15,13 +16,39 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const API_URL = `http://${BACKEND_URL}:2052/api/ride`; // Change to your actual backend URL
 
-const Requests = () => {
+const handleRejectRide = async (rideId) => {
+  try {
+    setLoading(true);
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      setError("Authentication required. Please login.");
+      setLoading(false);
+      return;
+    }
+
+    await axios.delete(`${API_URL}/${rideId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Remove ride from state
+    setRides(rides.filter((ride) => ride._id !== rideId));
+  } catch (error) {
+    console.error("Error deleting ride:", error);
+    setError(error.response?.data?.message || "Failed to delete the ride");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const Requests = (props) => {
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState(null);
 
+  const params = useLocalSearchParams();
+
   useEffect(() => {
-    !loading && fetchRideRequests();
+    fetchRideRequests();
   }, []);
 
   useEffect(() => {
@@ -43,10 +70,8 @@ const Requests = () => {
 
       // Use the endpoint for getting all rides by the logged-in user
       // You'll need to create this endpoint on your backend if it doesn't exist
-      const response = await axios.post(`${API_URL}/ride/getRequests`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.post(`${API_URL}/getRequests`, {
+        rideId: params.rideId,
       });
 
       console.log("User requests received:", response.data);
@@ -63,11 +88,60 @@ const Requests = () => {
     }
   };
 
+  const renderRequestCard = ({ item }) => (
+    <View style={styles.rideCard}>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailLabel}>Request By:</Text>
+        <Text style={styles.detailValue}>
+          {item.requestById.firstname} {item.requestById.lastname}
+        </Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailLabel}>Pickup Point:</Text>
+        <Text style={styles.detailValue}>{item.pickupPoint}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailLabel}>Dropoff Point:</Text>
+        <Text style={styles.detailValue}>{item.dropoffPoint}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailLabel}>Time:</Text>
+        <Text style={styles.detailValue}>{item.createdAt}</Text>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.deleteButton]}
+          onPress={() => handleAcceptRide(item._id)}
+        >
+          <Text style={styles.buttonText}>Accept</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
+          onPress={() => handleRejectRide(item._id)}
+        >
+          <Text style={styles.buttonText}>Reject</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Requests</Text>
       </SafeAreaView>
+      <FlatList
+        data={requests}
+        renderItem={renderRequestCard}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={styles.rideList}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaProvider>
   );
 };

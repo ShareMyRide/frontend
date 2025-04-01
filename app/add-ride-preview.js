@@ -103,7 +103,10 @@ export default function UserRidesPreview({ jumpTo, user }) {
       setLoading(false);
     }
   };
-
+  const handleAddRide = () => {
+    // If we have jumpTo, we're in the tab navigator context
+    router.push("/add-ride");
+  };
   const renderRideCard = ({ item }) => (
     <View style={styles.rideCard}>
       <View style={styles.detailRow}>
@@ -126,7 +129,11 @@ export default function UserRidesPreview({ jumpTo, user }) {
         <Text style={styles.detailValue}>{item.beginningTime}</Text>
       </View>
 
-      <TouchableOpacity onPress={() => router.push("/requests")}>
+      <TouchableOpacity
+        onPress={() =>
+          router.push({ pathname: `/requests`, params: { rideId: item._id } })
+        }
+      >
         <Text>Requests</Text>
       </TouchableOpacity>
 

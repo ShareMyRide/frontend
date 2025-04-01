@@ -3,7 +3,7 @@ import { Pressable, Button, Text, View, StyleSheet } from 'react-native';
 import { TextInput } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Formik } from "formik";
-import * as Yup from 'yup'; // Add Yup for validation
+import * as Yup from 'yup';  // Add Yup for validation
 import { Link, useRouter } from "expo-router";
 import axios from 'axios';
 import { LinearGradient } from "expo-linear-gradient";
@@ -96,7 +96,7 @@ const register = () => {
                       First Name:{" "}
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("fname")}
                       onBlur={handleBlur("fname")}
                       value={values.fname}
@@ -111,7 +111,7 @@ const register = () => {
                       Last Name:{" "}
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("lname")}
                       onBlur={handleBlur("lname")}
                       value={values.lname}
@@ -126,7 +126,7 @@ const register = () => {
                       E-mail:{" "}
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("email")}
                       onBlur={handleBlur("email")}
                       value={values.email}
@@ -142,7 +142,7 @@ const register = () => {
                       NIC number:{" "}
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("nic")}
                       onBlur={handleBlur("nic")}
                       value={values.nic}
@@ -157,7 +157,7 @@ const register = () => {
                       Password:{" "}
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("pswrd")}
                       onBlur={handleBlur("pswrd")}
                       value={values.pswrd}
@@ -173,7 +173,7 @@ const register = () => {
                       Confirm Password:
                     </Text>
                     <TextInput
-                      className="border1"
+                      className="border p-2"
                       onChangeText={handleChange("confPswrd")}
                       onBlur={handleBlur("confPswrd")}
                       value={values.confPswrd}

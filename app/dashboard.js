@@ -161,8 +161,11 @@ const Dashboard = ({ user }) => {
         onPress={navigateToChatbot} 
         style={styles.floatingChatButton}
       >
-        <Ionicons name="chatbubble" size={24} color="#FFFFFF" />
-        <Text style={styles.chatButtonText}>Support</Text>
+        <Image 
+            source={require('../assets/images/chat.png')} 
+            style={styles.logo} 
+            resizeMode="contain"
+          />
       </Pressable>
 
       <Modal
@@ -366,6 +369,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  logo: {
+    width: 45,
+    height: 45,
+    marginLeft: 10,
+  }
 });
 
 export default Dashboard;

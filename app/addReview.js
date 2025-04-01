@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+
 const BACKEND_URL = process.env.BACKEND_URL
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { TextInput } from "react-native-paper";
+
 const AddReview = ({ appName }) => {
   const [rating, setRating] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(true);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   const navigation = useNavigation(); // Get navigation object
 
@@ -25,12 +29,16 @@ const AddReview = ({ appName }) => {
 
   const handleOk = () => {
     setShowThankYouModal(false);
-    navigation.navigate('Review'); // Navigate to the Review page
   };
 
   const handleWriteReview = () => {
     setShowThankYouModal(false);
-    navigation.navigate('Review'); // Navigate when "Write a Review" is clicked
+    setShowReviewModal(true);
+  };
+
+  const handleReviewOk = () => {
+    setShowReviewModal(false);
+    navigation.navigate("review"); // Navigate when "Write a Review" is clicked
   };
 
   return (
@@ -48,8 +56,16 @@ const AddReview = ({ appName }) => {
 
             <View style={styles.starsContainer}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <TouchableOpacity key={star} onPress={() => handleRating(star)} style={styles.starButton}>
-                  <AntDesign name={star <= rating ? 'star' : 'staro'} size={40} color="#007AFF" />
+                <TouchableOpacity
+                  key={star}
+                  onPress={() => handleRating(star)}
+                  style={styles.starButton}
+                >
+                  <AntDesign
+                    name={star <= rating ? "star" : "staro"}
+                    size={40}
+                    color="#007AFF"
+                  />
                 </TouchableOpacity>
               ))}
             </View>
@@ -59,8 +75,19 @@ const AddReview = ({ appName }) => {
                 <Text style={styles.buttonTextBlue}>Cancel</Text>
               </TouchableOpacity>
               <View style={styles.buttonDivider} />
-              <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={rating === 0}>
-                <Text style={[styles.buttonTextBlue, rating === 0 && styles.buttonDisabled]}>Submit</Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleSubmit}
+                disabled={rating === 0}
+              >
+                <Text
+                  style={[
+                    styles.buttonTextBlue,
+                    rating === 0 && styles.buttonDisabled,
+                  ]}
+                >
+                  Submit
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -86,12 +113,32 @@ const AddReview = ({ appName }) => {
               ))}
             </View>
 
-            <TouchableOpacity style={styles.reviewButton} onPress={handleWriteReview}>
+            <TouchableOpacity
+              style={styles.reviewButton}
+              onPress={handleWriteReview}
+            >
               <Text style={styles.buttonTextBlue}>Write a Review</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.okButton} onPress={handleOk}>
               <Text style={styles.buttonTextBlue}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        visible={showReviewModal}
+        animationType="fade"
+        onRequestClose={handleOk}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Write a review</Text>
+            <TextInput multiline={true} numberOfLines={4} />
+            <TouchableOpacity style={styles.okButton} onPress={handleReviewOk}>
+              <Text style={styles.buttonTextBlue}>Submit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -103,68 +150,68 @@ const AddReview = ({ appName }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '90%',
-    backgroundColor: 'white',
+    width: "90%",
+    backgroundColor: "white",
     borderRadius: 15,
     padding: 20,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
+    textAlign: "center",
+    color: "#666",
   },
   starsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginVertical: 20,
   },
   starButton: {
     padding: 5,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   button: {
     flex: 1,
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonDivider: {
     width: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: "#E0E0E0",
   },
   buttonTextBlue: {
-    color: '#007AFF',
+    color: "#007AFF",
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   reviewButton: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   okButton: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
 });
 

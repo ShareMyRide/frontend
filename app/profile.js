@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
+import {
+  Image,
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -13,7 +22,7 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const params = useLocalSearchParams();
   const router = useRouter();
-  
+
   // Get user data from params if available
   const propUser = params.user;
 
@@ -22,20 +31,21 @@ const Profile = () => {
       // Get token and userId from AsyncStorage
       const token = await AsyncStorage.getItem("token");
       let userId = await AsyncStorage.getItem("userId");
-      
+
       // Check if user data was passed as a prop
       if (propUser) {
         console.log("Using user data from props:", propUser);
-        
+
         // Parse user data if it's a string
-        const parsedUser = typeof propUser === 'string' ? JSON.parse(propUser) : propUser;
-        
+        const parsedUser =
+          typeof propUser === "string" ? JSON.parse(propUser) : propUser;
+
         // Extract userId from parsed data
         if (parsedUser.id || parsedUser._id) {
           userId = parsedUser.id || parsedUser._id;
         }
       }
-      
+
       // If userId or token is missing, try to get from cached data
       if (!userId || !token) {
         const cachedUserData = await AsyncStorage.getItem("userData");
@@ -43,42 +53,42 @@ const Profile = () => {
           const parsedCachedData = JSON.parse(cachedUserData);
           userId = parsedCachedData.id || parsedCachedData._id;
         }
-        
+
         if (!userId) {
           setError("User ID not found");
           setLoading(false);
           return;
         }
-        
+
         if (!token) {
           setError("Not logged in!");
           setLoading(false);
           return;
         }
       }
-      
+
       // Fetch user data from API
       console.log("Fetching detailed user data for ID:", userId);
 
+      const response = await axios.get(
+        `http://${BACKEND_URL}:2052/api/auth/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const response = await axios.get(`http://${BACKEND_URL}:2052/api/auth/users/${userId}`, {
-
-
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
       console.log("Fetched detailed user data:", response.data);
-      
+
       // Cache the user data
       await AsyncStorage.setItem("userData", JSON.stringify(response.data));
-      
+
       setUserData(response.data);
       if (response.data && (response.data.id || response.data._id)) {
         // Fetch the most recent ride for this user
         const userId = response.data.id || response.data._id;
-        
+
         try {
           const rideResponse = await axios.get(
             `http://${BACKEND_URL}:2052/api/ride/latestByUser/${userId}`,
@@ -88,24 +98,32 @@ const Profile = () => {
               },
             }
           );
-          
+
           console.log("Fetched ride data:", rideResponse.data);
           setRideData(rideResponse.data);
-          
+
           // Update the user data with vehicle details if not already present
           if (rideResponse.data && !response.data.vehicleDetails) {
             const updatedUserData = {
               ...response.data,
               vehicleType: rideResponse.data.vehicleType,
               vehicleNumber: rideResponse.data.vehicleNumber,
-              vehicleDetails: `${rideResponse.data.vehicleType || 'Unknown'} (${rideResponse.data.vehicleNumber || 'No plate number'})`
+              vehicleDetails: `${rideResponse.data.vehicleType || "Unknown"} (${
+                rideResponse.data.vehicleNumber || "No plate number"
+              })`,
             };
-            
+
             setUserData(updatedUserData);
-            await AsyncStorage.setItem("userData", JSON.stringify(updatedUserData));
+            await AsyncStorage.setItem(
+              "userData",
+              JSON.stringify(updatedUserData)
+            );
           } else {
             setUserData(response.data);
-            await AsyncStorage.setItem("userData", JSON.stringify(response.data));
+            await AsyncStorage.setItem(
+              "userData",
+              JSON.stringify(response.data)
+            );
           }
         } catch (rideError) {
           console.error("Error fetching ride data:", rideError);
@@ -114,14 +132,14 @@ const Profile = () => {
           await AsyncStorage.setItem("userData", JSON.stringify(response.data));
         }
       }
-      
+
       setLoading(false);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError("Failed to load profile data");
       setLoading(false);
-      
+
       // Try to use cached data as fallback
       try {
         const cachedUserData = await AsyncStorage.getItem("userData");
@@ -146,50 +164,57 @@ const Profile = () => {
         [
           {
             text: "Cancel",
-            style: "cancel"
+            style: "cancel",
           },
           {
             text: "Delete",
             onPress: async () => {
               setLoading(true);
-              
+
               const token = await AsyncStorage.getItem("token");
               const userId = userData._id || userData.id;
-              
+
               if (!token || !userId) {
                 setError("Authentication required");
                 setLoading(false);
                 return;
               }
-              
-              const response = await axios.delete(`http://192.168.216.78:2052/api/auth/users/${userId}`, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-              
+
+              const response = await axios.delete(
+                `http://192.168.216.78:2052/api/auth/users/${userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
               // Clear local storage
               await AsyncStorage.removeItem("token");
               await AsyncStorage.removeItem("userId");
               await AsyncStorage.removeItem("userData");
-              
+
               // Show success message and redirect
-              Alert.alert("Success", "Your account has been deleted successfully", [
-                {
-                  text: "OK",
-                  onPress: () => router.replace("/login")
-                }
-              ]);
+              Alert.alert(
+                "Success",
+                "Your account has been deleted successfully",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => router.replace("/login"),
+                  },
+                ]
+              );
             },
-            style: "destructive"
-          }
+            style: "destructive",
+          },
         ]
       );
     } catch (error) {
       console.error("Error deleting account:", error);
       setError(error.response?.data?.message || "Failed to delete account");
       setLoading(false);
-      
+
       Alert.alert("Error", "Failed to delete account. Please try again later.");
     }
   };
@@ -254,7 +279,8 @@ const Profile = () => {
               style={styles.profileImage}
             />
             <Text style={styles.profileName}>
-              {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+              {userData.firstname || userData.username || "User"}{" "}
+              {userData.lastname || ""}
             </Text>
           </View>
 
@@ -263,20 +289,25 @@ const Profile = () => {
               <Text style={styles.detailLabel}>Full Name:</Text>
               <View style={styles.detailBox}>
                 <Text style={styles.detailValue}>
-                  {userData.firstname || userData.username || "User"} {userData.lastname || ""}
+                  {userData.firstname || userData.username || "User"}{" "}
+                  {userData.lastname || ""}
                 </Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>Email:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>{userData.email || "No email provided"}</Text>
+                <Text style={styles.detailValue}>
+                  {userData.email || "No email provided"}
+                </Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
               <Text style={styles.detailLabel}>NIC:</Text>
               <View style={styles.detailBox}>
-                <Text style={styles.detailValue}>{userData.NIC || "Not provided"}</Text>
+                <Text style={styles.detailValue}>
+                  {userData.NIC || "Not provided"}
+                </Text>
               </View>
             </View>
             <View style={styles.detailContainer}>
@@ -301,12 +332,15 @@ const Profile = () => {
               <Link href="/editProfile" asChild>
                 <Text style={styles.saveButtonText}>Edit Profile</Text>
               </Link>
-            </TouchableOpacity>                      
+            </TouchableOpacity>
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.deleteButton} onPress={deleteAccount}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={deleteAccount}
+            >
               <Text style={styles.saveButtonText}>Delete Account</Text>
-            </TouchableOpacity>                      
+            </TouchableOpacity>
           </View>
           <View style={styles.navigationLinks}>
             <Link href="/review" asChild>
@@ -414,14 +448,14 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   saveButton: {
-    backgroundColor: "#F97316", 
+    backgroundColor: "#F97316",
     width: "100%",
     padding: 16,
     justifyContent: "center",
     borderRadius: 8,
   },
   deleteButton: {
-    backgroundColor: "#d32f2f", 
+    backgroundColor: "#d32f2f",
     width: "100%",
     padding: 16,
     justifyContent: "center",
@@ -435,4 +469,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default profile;
+export default Profile;

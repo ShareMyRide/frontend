@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, Text, View, Modal, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  Modal,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Image,
+} from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,7 +17,7 @@ const BACKEND_URL = process.env.BACKEND_URL;
 const Dashboard = ({ user }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [userData, setUserData] = useState(user);
-  
+
   useEffect(() => {
     console.log("Dashboard received user:", user);
     // If no user data is passed as prop, try to get it from AsyncStorage
@@ -25,7 +33,7 @@ const Dashboard = ({ user }) => {
         }
       }
     };
-    
+
     getUserData();
   }, [user]);
 
@@ -41,13 +49,13 @@ const Dashboard = ({ user }) => {
     try {
       // Get the latest user data from AsyncStorage
       const storedUserData = await AsyncStorage.getItem("userData");
-      
+
       // Navigate to profile with user data
       router.push({
         pathname: "/profile",
-        params: { user: storedUserData || JSON.stringify(userData) }
+        params: { user: storedUserData || JSON.stringify(userData) },
       });
-      
+
       closeMenu();
     } catch (error) {
       console.error("Error navigating to profile:", error);
@@ -56,7 +64,7 @@ const Dashboard = ({ user }) => {
       closeMenu();
     }
   };
-  
+
   const navigateToEditProfile = () => {
     router.push("/editProfile");
     closeMenu();
@@ -69,19 +77,25 @@ const Dashboard = ({ user }) => {
     try {
       // Get the authentication token from AsyncStorage
       const token = await AsyncStorage.getItem("authToken");
-      console.log("Token for logout:", token ? token.substring(0, 10) + "..." : "Not found");
-      
+      console.log(
+        "Token for logout:",
+        token ? token.substring(0, 10) + "..." : "Not found"
+      );
+
       if (token) {
         // Call the logout API endpoint
         try {
-          const response = await fetch("http://${BACKEND_URL}:2052/api/auth/logout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
+          const response = await fetch(
+            "http://${BACKEND_URL}:2052/api/auth/logout",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
-          
+          );
+
           if (response.ok) {
             console.log("Logged out successfully on server");
           } else {
@@ -91,9 +105,11 @@ const Dashboard = ({ user }) => {
           console.error("Network error during server logout:", networkError);
         }
       } else {
-        console.warn("No authentication token found for logout - continuing with local logout");
+        console.warn(
+          "No authentication token found for logout - continuing with local logout"
+        );
       }
-      
+
       // Continue with local logout regardless of server response
     } catch (error) {
       console.error("Error during logout preparation:", error);
@@ -121,14 +137,14 @@ const Dashboard = ({ user }) => {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Dashboard</Text>
         </View>
-       
       </View>
 
       {/* Display user information if available */}
       {userData && (
         <View style={styles.userInfo}>
           <Text style={styles.welcomeText}>
-            Welcome, {userData.username || userData.firstname || userData.name || "User"}
+            Welcome,{" "}
+            {userData.username || userData.firstname || userData.name || "User"}
           </Text>
           <Text style={styles.emailText}>{userData.email}</Text>
         </View>
@@ -157,15 +173,12 @@ const Dashboard = ({ user }) => {
       </View>
 
       {/* Floating chatbot button for easy access */}
-      <Pressable 
-        onPress={navigateToChatbot} 
-        style={styles.floatingChatButton}
-      >
-        <Image 
-            source={require('../assets/images/chat.png')} 
-            style={styles.logo} 
-            resizeMode="contain"
-          />
+      <Pressable onPress={navigateToChatbot} style={styles.floatingChatButton}>
+        <Image
+          source={require("../assets/images/chat.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </Pressable>
 
       <Modal
@@ -184,21 +197,31 @@ const Dashboard = ({ user }) => {
                     <Ionicons name="close" size={24} color="#333" />
                   </Pressable>
                 </View>
-                
+
                 <Pressable onPress={navigateToProfile}>
                   <View style={styles.menuItem}>
-                    <Ionicons name="person" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Ionicons
+                      name="person"
+                      size={20}
+                      color="#f97316"
+                      style={styles.menuIcon}
+                    />
                     <Text style={styles.menuItemText}>View Profile</Text>
                   </View>
                 </Pressable>
-                
+
                 <Pressable onPress={navigateToEditProfile}>
                   <View style={styles.menuItem}>
-                    <Ionicons name="create" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Ionicons
+                      name="create"
+                      size={20}
+                      color="#f97316"
+                      style={styles.menuIcon}
+                    />
                     <Text style={styles.menuItemText}>Edit Profile</Text>
                   </View>
                 </Pressable>
-                
+
                 <Pressable
                   onPress={() => {
                     router.push("/add-ride-preview");
@@ -206,14 +229,24 @@ const Dashboard = ({ user }) => {
                   }}
                 >
                   <View style={styles.menuItem}>
-                    <Ionicons name="car" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Ionicons
+                      name="car"
+                      size={20}
+                      color="#f97316"
+                      style={styles.menuIcon}
+                    />
                     <Text style={styles.menuItemText}>Your Rides</Text>
                   </View>
                 </Pressable>
-                
+
                 <Pressable onPress={handleLogout}>
                   <View style={styles.menuItem}>
-                    <Ionicons name="log-out" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Ionicons
+                      name="log-out"
+                      size={20}
+                      color="#f97316"
+                      style={styles.menuIcon}
+                    />
                     <Text style={styles.menuItemText}>Logout</Text>
                   </View>
                 </Pressable>
@@ -229,7 +262,7 @@ const Dashboard = ({ user }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5", 
+    backgroundColor: "#F5F5F5",
     padding: 20,
   },
   header: {
@@ -289,7 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   actionButton: {
-    backgroundColor: "#f97316", 
+    backgroundColor: "#f97316",
     paddingVertical: 14,
     paddingHorizontal: 30,
     borderRadius: 30,
@@ -373,7 +406,7 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     marginLeft: 10,
-  }
+  },
 });
 
 export default Dashboard;

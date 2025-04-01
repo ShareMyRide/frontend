@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, Text, View, Modal, StyleSheet ,Image} from "react-native";
+import { Pressable, Text, View, Modal, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+const BACKEND_URL = process.env.BACKEND_URL;
 
 const Dashboard = ({ user }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -32,6 +33,10 @@ const Dashboard = ({ user }) => {
     setIsMenuVisible(!isMenuVisible);
   };
 
+  const closeMenu = () => {
+    setIsMenuVisible(false);
+  };
+
   const navigateToProfile = async () => {
     try {
       // Get the latest user data from AsyncStorage
@@ -43,22 +48,70 @@ const Dashboard = ({ user }) => {
         params: { user: storedUserData || JSON.stringify(userData) }
       });
       
-      toggleMenu();
+      closeMenu();
     } catch (error) {
       console.error("Error navigating to profile:", error);
       // Fallback navigation without parameters
       router.push("/profile");
-      toggleMenu();
+      closeMenu();
     }
   };
+  
   const navigateToEditProfile = () => {
     router.push("/editProfile");
+    closeMenu();
   };
 
   const navigateToChatbot = () => {
     router.push("/chatbot");
   };
-
+  const handleLogout = async () => {
+    try {
+      // Get the authentication token from AsyncStorage
+      const token = await AsyncStorage.getItem("authToken");
+      console.log("Token for logout:", token ? token.substring(0, 10) + "..." : "Not found");
+      
+      if (token) {
+        // Call the logout API endpoint
+        try {
+          const response = await fetch("http://${BACKEND_URL}:2052/api/auth/logout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            console.log("Logged out successfully on server");
+          } else {
+            console.warn("Server logout failed with status:", response.status);
+          }
+        } catch (networkError) {
+          console.error("Network error during server logout:", networkError);
+        }
+      } else {
+        console.warn("No authentication token found for logout - continuing with local logout");
+      }
+      
+      // Continue with local logout regardless of server response
+    } catch (error) {
+      console.error("Error during logout preparation:", error);
+    } finally {
+      // Always clear local storage and redirect
+      try {
+        await AsyncStorage.multiRemove(["authToken", "userData"]);
+        console.log("Local storage cleared");
+        router.replace("/login");
+        closeMenu();
+      } catch (storageError) {
+        console.error("Error clearing storage:", storageError);
+        // Last resort - just redirect
+        router.replace("/login");
+        closeMenu();
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -119,53 +172,55 @@ const Dashboard = ({ user }) => {
         visible={isMenuVisible}
         animationType="slide"
         transparent={true}
-        onRequestClose={toggleMenu}
+        onRequestClose={closeMenu}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Pressable onPress={navigateToProfile}>
-              <View style={styles.menuItem}>
-                <Text style={styles.menuItemText}>View Profile</Text>
+        <TouchableWithoutFeedback onPress={closeMenu}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+              <View style={styles.modalContent}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>Menu</Text>
+                  <Pressable onPress={closeMenu} style={styles.closeButton}>
+                    <Ionicons name="close" size={24} color="#333" />
+                  </Pressable>
+                </View>
+                
+                <Pressable onPress={navigateToProfile}>
+                  <View style={styles.menuItem}>
+                    <Ionicons name="person" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Text style={styles.menuItemText}>View Profile</Text>
+                  </View>
+                </Pressable>
+                
+                <Pressable onPress={navigateToEditProfile}>
+                  <View style={styles.menuItem}>
+                    <Ionicons name="create" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Text style={styles.menuItemText}>Edit Profile</Text>
+                  </View>
+                </Pressable>
+                
+                <Pressable
+                  onPress={() => {
+                    router.push("/add-ride-preview");
+                    closeMenu();
+                  }}
+                >
+                  <View style={styles.menuItem}>
+                    <Ionicons name="car" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Text style={styles.menuItemText}>Your Rides</Text>
+                  </View>
+                </Pressable>
+                
+                <Pressable onPress={handleLogout}>
+                  <View style={styles.menuItem}>
+                    <Ionicons name="log-out" size={20} color="#f97316" style={styles.menuIcon} />
+                    <Text style={styles.menuItemText}>Logout</Text>
+                  </View>
+                </Pressable>
               </View>
-            </Pressable>
-            <Pressable onPress={navigateToEditProfile}>
-              <View style={styles.menuItem}>
-                <Text style={styles.menuItemText}>Edit Profile</Text>
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                router.push("/add-ride-preview");
-                toggleMenu();
-              }}
-            >
-              <View style={styles.menuItem}>
-                <Text style={styles.menuItemText}>Your Rides</Text>
-              </View>
-            </Pressable>
-            {/* <Pressable
-              onPress={() => {
-                router.push("/chatbot");
-                toggleMenu();
-              }}
-            >
-              <View style={styles.menuItem}>
-                <Ionicons name="chatbubble-ellipses" size={18} color="#f97316" style={{marginRight: 10}} />
-                <Text style={styles.menuItemText}>Support Chat</Text>
-              </View>
-            </Pressable> */}
-            <Pressable
-              onPress={() => {
-                router.push("/login");
-                toggleMenu();
-              }}
-            >
-              <View style={styles.menuItem}>
-                <Text style={styles.menuItemText}>Logout</Text>
-              </View>
-            </Pressable>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
@@ -265,22 +320,50 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 8,
   },
-  modalContainer: {
+  modalOverlay: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-start",
   },
   modalContent: {
     backgroundColor: "white",
+    marginTop: 50,
+    marginLeft: 10,
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
     width: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  closeButton: {
+    padding: 5,
   },
   menuItem: {
-    paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  menuIcon: {
+    marginRight: 12,
   },
   menuItemText: {
     fontSize: 16,

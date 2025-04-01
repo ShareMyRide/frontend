@@ -1,3 +1,5 @@
+
+const BACKEND_URL = process.env.BACKEND_URL
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { AntDesign } from "@expo/vector-icons";

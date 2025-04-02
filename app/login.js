@@ -55,14 +55,14 @@ const login = () => {
       console.log("Login successful:", response.data);
 
       // Store the token with the CORRECT KEY that matches logout function
-      await AsyncStorage.setItem("authToken", response.data.token);
+      await AsyncStorage.setItem("token", response.data.token);
       await AsyncStorage.setItem("userId", response.data.user.id);
       await AsyncStorage.setItem(
         "userData",
         JSON.stringify(response.data.user)
       );
 
-      const storedToken = await AsyncStorage.getItem("authToken");
+      const storedToken = await AsyncStorage.getItem("token");
       console.log("Token stored successfully:", storedToken ? "Yes" : "No");
 
       alert("Login successful!");
